@@ -15,6 +15,10 @@ class BookController extends Controller
         return view('books.index', ['books' => $books, 'user'=>Auth::user()]);
     }
 
+    public static function searchForm(){
+        return view('books.search-form');
+    }
+
     public function search(Request $request){
 
         /* Search book implementation */

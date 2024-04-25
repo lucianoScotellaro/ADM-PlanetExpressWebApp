@@ -22,7 +22,7 @@ class UserController extends Controller
 
     public function booksOnLoanCreate():View|Factory|Application
     {
-        return view('books.search-form');
+        return BookController::searchForm();
     }
 
     public function addBookOnLoan(User $user, Book $book): View|Factory|Application
@@ -40,7 +40,13 @@ class UserController extends Controller
 
     public function removeBookOnLoan(User $user, Book $book): View|Factory|Application
     {
-        $user->books()->sync($book->ISBN, ['onLoan'=>false]);
-        return view('users.show-books', ["user" => $user, "books" => $user->books]);
+        try
+        {
+            $user->books()->detach($book->ISBN);
+        }catch (\Exception $exception)
+        {
+            $message = $exception->getMessage();
+        }
+        return view('users.show-books', ["user" => $user, "books" => $user->booksOnLoan()]);
     }
 }

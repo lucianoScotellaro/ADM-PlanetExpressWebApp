@@ -16,9 +16,6 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create();
 
-        Book::factory(20)->create()
-            ->each(function (Book $book) {
-            $book->users()->attach(1, ['onLoan'=>true]);
-        });
+        Book::factory(20)->create();
     }
 }
