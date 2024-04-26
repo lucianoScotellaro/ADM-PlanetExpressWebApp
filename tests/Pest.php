@@ -11,10 +11,18 @@
 |
 */
 
+use App\Models\Book;
+use App\Models\User;
+
 uses(
     Tests\TestCase::class,
     // Illuminate\Foundation\Testing\RefreshDatabase::class,
 )->in('Feature');
+
+uses(
+    Tests\TestCase::class,
+// Illuminate\Foundation\Testing\RefreshDatabase::class,
+)->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +50,19 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function userWithBooks():User
 {
-    // ..
+    $user = User::factory()->create();
+    Book::factory(10)->create();
+
+    Book::all()->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->ISBN, ['onLoan'=>fake()->boolean]);
+    });
+    return $user;
+}
+
+function login ($user = null)
+{
+    return test()->actingAs($user ?? User::factory()->create());
 }

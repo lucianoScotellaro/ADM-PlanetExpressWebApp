@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -53,16 +54,8 @@ class User extends Authenticatable
             ->withPivot('onLoan');
     }
 
-    public function booksOnLoan():array
+    public function booksOnLoan(): Collection
     {
-        $booksOnLoan = array();
-
-        foreach ($this->books as $book)
-        {
-            if($book->pivot->onLoan){
-                $booksOnLoan[] = $book;
-            }
-        }
-        return $booksOnLoan;
+        return $this->books()->wherePivot('onLoan', 1)->get();
     }
 }

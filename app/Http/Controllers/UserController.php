@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\User;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 
 class UserController extends Controller
 {
@@ -25,28 +28,31 @@ class UserController extends Controller
         return BookController::searchForm();
     }
 
-    public function addBookOnLoan(User $user, Book $book): View|Factory|Application
+    public function addBookOnLoan(User $user, Book $book): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
         try
         {
             $user->books()->attach($book->ISBN, ['onLoan'=>true]);
+            $message = 'Book added successfully';
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             $message = $exception->getMessage();
         }
-        return view('users.show-books', ["user" => $user, "books" => $user->booksOnLoan()]);
+        return redirect('/users/'.$user->id.'/books/onloan')->with('message', $message);
     }
 
-    public function removeBookOnLoan(User $user, Book $book): View|Factory|Application
+    public function removeBookOnLoan(User $user, Book $book): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
         try
         {
             $user->books()->detach($book->ISBN);
-        }catch (\Exception $exception)
+            $message = 'Book removed successfully';
+        }
+        catch (Exception $exception)
         {
             $message = $exception->getMessage();
         }
-        return view('users.show-books', ["user" => $user, "books" => $user->booksOnLoan()]);
+        return redirect('/users/'.$user->id.'/books/onloan')->with('message', $message);
     }
 }
