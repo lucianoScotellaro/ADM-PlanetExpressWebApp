@@ -38,5 +38,5 @@ jobs:
         DB_DATABASE: database/database.sqlite
         CC_TEST_REPORTER_ID: a94e27f77e017688e34302396fe01d4f72587cc3baefd3d997ff5975e6765a53
       run: |
-        php artisan test --coverage-clover=clover.xml
+        php artisan test --coverage-clover=clover.xml --min=80
         ./cc-test-reporter after-build -t clover --exit-code $?
