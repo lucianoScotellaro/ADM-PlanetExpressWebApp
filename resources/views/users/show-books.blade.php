@@ -18,7 +18,7 @@
                             <div class="flex flex-row min-w-0 gap-x-4">
                                 <div class="basis-3/4">
                                     <div class="flex flex-row">
-                                        <x-book-image></x-book-image>
+                                        <x-book-image class="w-1/6"></x-book-image>
                                         <div class="basis-5/6 flex flex-col">
                                             <div class="mb-3">
                                                 <x-book-title>{{$book->title}}</x-book-title>
@@ -33,7 +33,7 @@
                                 <div class="flex basis-1/6 justify-items-center items-center">
                                     <div class="flex flex-col w-2/3">
                                         <x-button href="/loan/{{$user->id}}/{{$book->ISBN}}" class="mb-10">Richiedi Prestito</x-button>
-                                        <x-button href="/trades/{{$user->id}}/{{$book->ISBN}}">Proponi Scambio</x-button>
+                                        <x-button href="/trades/ask/{{$user->id}}/{{$book->ISBN}}">Proponi Scambio</x-button>
                                     </div>
                                 </div>
                             </div>

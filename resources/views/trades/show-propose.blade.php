@@ -18,7 +18,7 @@
                             <div class="flex flex-row min-w-0 gap-x-4">
                                 <div class="basis-3/4">
                                     <div class="flex flex-row">
-                                        <x-book-image></x-book-image>
+                                        <x-book-image class="w-1/6"></x-book-image>
                                         <div class="basis-5/6 flex flex-col">
                                             <div class="mb-3">
                                                 <x-book-title>{{$book->title}}</x-book-title>
