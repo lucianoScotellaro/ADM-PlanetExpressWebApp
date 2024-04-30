@@ -28,15 +28,22 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
-    - name: Code Climate Setup
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter && chmod +x ./cc-test-reporter
-        ./cc-test-reporter before-build
     - name: Execute tests with coverage (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
-        CC_TEST_REPORTER_ID: a94e27f77e017688e34302396fe01d4f72587cc3baefd3d997ff5975e6765a53
       run: |
-        php artisan test --coverage-clover=clover.xml --min=80
-        ./cc-test-reporter after-build -t clover --exit-code $?
+        php artisan test --coverage-clover=coverage.xml --min=80
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    - name: SonarQube Quality Gate check
+      id: sonarqube-quality-gate-check
+      uses: sonarsource/sonarqube-quality-gate-action@master
+      # Force to fail step after specific time.
+      timeout-minutes: 5
+      env:
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
