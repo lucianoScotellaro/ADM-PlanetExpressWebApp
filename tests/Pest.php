@@ -11,10 +11,19 @@
 |
 */
 
+use App\Models\Book;
+use App\Models\TradeRequest;
+use App\Models\User;
+
 uses(
     Tests\TestCase::class,
     // Illuminate\Foundation\Testing\RefreshDatabase::class,
 )->in('Feature');
+
+uses(
+    Tests\TestCase::class,
+    // Illuminate\Foundation\Testing\RefreshDatabase::class,
+)->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -27,10 +36,6 @@ uses(
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -42,7 +47,38 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+// Book utils functions
+function bookWithUsers():array
 {
-    // ..
+    $book = Book::factory()->create([
+        'title' => 'Divina Commedia',
+        'author' => 'Dante Alighieri',
+        'ISBN' => 9788809612921
+    ]);
+
+    $users = User::factory(5)->create();
+
+    $users->each(function ($user) use ($book) {
+        $book->users()->attach($user->id);
+    });
+
+    return ['book' => $book, 'users' => $users];
+}
+
+//User utils functions
+function userWithBooks():array
+{
+    $user = User::factory()->create();
+
+    $books = Book::factory(5)->create();
+    $books->each(function ($book) use ($user) {
+       $user->books()->attach($book->ISBN);
+    });
+
+    return ['user' => $user, 'books' => $books];
+}
+
+function login(User $user = null)
+{
+    return test()->actingAs($user ?? User::factory()->create());
 }
