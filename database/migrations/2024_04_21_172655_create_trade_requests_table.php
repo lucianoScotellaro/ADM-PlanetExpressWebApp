@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Book;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,10 +14,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trade_requests', function (Blueprint $table) {
-            $table->unsignedBigInteger('receiver_id');
-            $table->unsignedBigInteger('sender_id');
-            $table->integer('proposed_book_ISBN');
-            $table->integer('requested_book_ISBN');
+            $table->foreignIdFor(User::class,'receiver_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignIdFor(User::class,'sender_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignIdFor(Book::class,'proposed_book_ISBN')->constrained('books','ISBN')->cascadeOnDelete();
+            $table->foreignIdFor(Book::class,'requested_book_ISBN')->constrained('books','ISBN')->cascadeOnDelete();
+            $table->boolean('response')->nullable()->default(null);
             $table->timestamps();
             $table->primary(['receiver_id', 'sender_id', 'proposed_book_ISBN', 'requested_book_ISBN']);
         });
