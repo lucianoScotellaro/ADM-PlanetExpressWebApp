@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
 use Illuminate\Http\Request;
 
-class BookController extends Controller
-{
-    public function show(Book $book){
-        dd($book);
-    }
-}
+class BookController extends Controller{}

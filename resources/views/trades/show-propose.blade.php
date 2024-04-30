@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="flex basis-1/6 justify-items-center items-center">
                                     <div class="flex flex-col w-2/3">
-                                        <form method="POST" action="/trades/{{$book->ISBN}}">
+                                        <form method="POST" action="/trades/propose/{{$book->ISBN}}">
                                             @csrf
                                             <x-form-button>Proponi</x-form-button>
                                         </form>

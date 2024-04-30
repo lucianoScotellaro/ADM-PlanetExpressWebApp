@@ -6,22 +6,22 @@ use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TradeRequestController extends Controller
 {
-    public function index(){
-        dd(DB::select('select * from trade_requests '));
+    public function index(User $user)
+    {
+        return view('trades.received.index', ['requests'=>$user->receivedTradeRequests]);
     }
 
     public function show(User $user, Book $book){
         session(['receiver'=>$user->id,'requestedBook'=>$book->ISBN]);
-        $activeUser = User::find(2);
-        return view('trades.show',['user'=>$activeUser,'books'=>$activeUser->books]);
+        $activeUser = User::find(2); //current user
+        return view('trades.show-propose',['user'=>$activeUser,'books'=>$activeUser->books]);
     }
 
     public function store(Book $book){
-        $user = User::find(2);
+        $user = User::find(2); //current user
         //Authorization
         TradeRequest::create([
             'receiver_id'=>session('receiver'),
