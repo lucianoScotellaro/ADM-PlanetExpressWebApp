@@ -9,21 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
-    public function index()
-    {
-        $books = Book::all();
-        return view('books.index', ['books' => $books, 'user'=>Auth::user()]);
-    }
 
     public static function searchForm(){
         return view('books.search-form');
     }
 
-    public function search(Request $request){
+    public function search(){
 
         /* Search book implementation */
 
-        return view('books.search-results', ['user'=>User::find(1), 'books'=>Book::all()]);
+        return view('books.search-results', ['user'=>Auth::user(), 'books'=>Book::all()]);
     }
 
 }

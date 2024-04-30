@@ -1,0 +1,6 @@
+projectKey=PlanetExpress
+serverUrl=http://localhost:9000
+serverVersion=10.5.0.89998
+dashboardUrl=http://localhost:9000/dashboard?id=PlanetExpress
+ceTaskId=abf97cef-46d8-4c5d-b805-32e9f853655a
+ceTaskUrl=http://localhost:9000/api/ce/task?id=abf97cef-46d8-4c5d-b805-32e9f853655a

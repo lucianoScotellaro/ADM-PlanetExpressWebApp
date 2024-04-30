@@ -37,22 +37,21 @@ class UserController extends Controller
         }
         catch (Exception $exception)
         {
-            $message = $exception->getMessage();
+            $message = 'Book already added';
         }
         return redirect('/users/'.$user->id.'/books/onloan')->with('message', $message);
     }
 
     public function removeBookOnLoan(User $user, Book $book): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
-        try
-        {
-            $user->books()->detach($book->ISBN);
+
+            $removed = $user->books()->detach($book->ISBN);
             $message = 'Book removed successfully';
-        }
-        catch (Exception $exception)
-        {
-            $message = $exception->getMessage();
-        }
+
+            if(!$removed){
+                $message = 'Book not in loans list';
+            }
+
         return redirect('/users/'.$user->id.'/books/onloan')->with('message', $message);
     }
 }
