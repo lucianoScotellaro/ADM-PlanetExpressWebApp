@@ -32,8 +32,7 @@ jobs:
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
-      run: |
-        php artisan test --coverage-clover=coverage.xml --min=80
+      run: php artisan test --coverage-clover=coverage.xml --min=80
     - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@master
       env:
