@@ -8,22 +8,32 @@ it('returns users\'s books', function (){
         ->toBeTrue();
 });
 
-it('returns users\'s received trade requests', function (){
+it('returns users\'s pending received trade requests', function (){
     $senderWithBooks = userWithBooks();
     $receiverWithBooks = userWithBooks();
 
-    $requests = TradeRequest::create([
+    $pendingRequest = TradeRequest::create([
         'sender_id'=>$senderWithBooks['user']->id,
         'receiver_id'=>$receiverWithBooks['user']->id,
         'requested_book_ISBN'=>$receiverWithBooks['books']->first()->ISBN,
-        'proposed_book_ISBN'=>$senderWithBooks['books']->first()->ISBN
+        'proposed_book_ISBN'=>$senderWithBooks['books']->first()->ISBN,
+        'response'=>null
     ]);
 
-    $receivedTradeRequests = $receiverWithBooks['user']->receivedTradeRequests()->get();
+    $resolvedRequest = TradeRequest::create([
+        'sender_id'=>$senderWithBooks['user']->id,
+        'receiver_id'=>$receiverWithBooks['user']->id,
+        'requested_book_ISBN'=>$receiverWithBooks['books']->last()->ISBN,
+        'proposed_book_ISBN'=>$senderWithBooks['books']->last()->ISBN,
+        'response'=>true
+    ]);
 
-    expect($receivedTradeRequests->count())->toBe(1)
-        ->and($receivedTradeRequests->pluck('sender_id') == $requests->pluck('sender_id'))
-        ->and($receivedTradeRequests->pluck('requested_book_ISBN') == $requests->pluck('requested_book_ISBN'))
-        ->and($receivedTradeRequests->pluck('proposed_book_ISBN') == $requests->pluck('proposed_book_ISBN'))
+    $pendingReceivedTradeRequests = $receiverWithBooks['user']->pendingReceivedTradeRequests()->get();
+
+    expect($pendingReceivedTradeRequests->count())->toBe(1)
+        ->and($pendingReceivedTradeRequests->first()->sender->id == $pendingRequest->sender->id)
+        ->and($pendingReceivedTradeRequests->first()->requestedBook->ISBN == $pendingRequest->requestedBook->ISBN)
+        ->and($pendingReceivedTradeRequests->first()->proposedBook->ISBN == $pendingRequest->proposedBook->ISBN)
+        ->and($pendingReceivedTradeRequests->first()->response == $pendingRequest->response)
         ->toBeTrue();
 });

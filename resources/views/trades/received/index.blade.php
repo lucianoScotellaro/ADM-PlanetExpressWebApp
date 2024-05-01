@@ -9,39 +9,53 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        <div class="flex flex-row h-screen">
-            <div class="basis-1/4"></div>
-            <div class="basis-3/4">
-                <ul role="list" class="divide-y divide-gray-100 h-full">
-                    @foreach($requests as $request)
-                        <li class="flex flex-auto justify-between py-5 h-full">
-                            <div class="flex flex-row justify-center content-center">
-                                <div class="basis-1/3">
-                                    <x-book-image class="w-1/7"></x-book-image>
-                                </div>
-                                <div class="basis-2/3">
-                                    <p>Titolo</p>
-                                    <p>Autore</p>
-                                    <p>ISBN</p>
-                                </div>
-                            </div>
-                            <div class="content-center">
-                                <img src="{{asset("img/swap.png")}}" class="h-12 w-12" alt="">
-                            </div>
-                            <div class="flex flex-row justify-center">
-                                <div class="basis-1/3 content-center">
-                                    <x-book-image class="w-1/7"></x-book-image>
-                                </div>
-                                <div class="basis-2/3 content-center">
-                                    <p>Titolo</p>
-                                    <p>Autore</p>
-                                    <p>ISBN</p>
+    <div class="flex flex-row">
+        <div class="basis-1/4"></div>
+        <div class="basis-3/4">
+            <ul role="list" class="divide-y divide-gray-100">
+                @foreach($requests as $request)
+                    <li class="justify-between gap-x-6 py-5 h-full">
+                        <div class="flex basis-3/4">
+                            <div class="basis-3/7 inline-flex">
+                                <x-book-image class="w-1/4"></x-book-image>
+                                <div class="w-full">
+                                    <div class="mb-3">
+                                        <p class="text-bold uppercase text-2xl">Cedi</p>
+                                        <x-book-title class="tex">{{$request->requestedBook->title}}</x-book-title>
+                                        <x-book-author>{{$request->requestedBook->author}}</x-book-author>
+                                    </div>
+                                    <div>
+                                        <x-book-isbn>{{$request->requestedBook->ISBN}}</x-book-isbn>
+                                    </div>
                                 </div>
                             </div>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
+                            <div class="flex flex-auto items-center">
+                                <img src="{{asset('img/swap.png')}}" class="w-12 h-12" alt="">
+                            </div>
+                            <div class="basis-3/7 inline-flex">
+                                <x-book-image class="w-1/4"></x-book-image>
+                                <div class="w-full">
+                                    <div class="mb-3">
+                                        <p class="text-bold uppercase text-2xl">Ricevi</p>
+                                        <x-book-title class="text-semibold">{{$request->requestedBook->title}}</x-book-title>
+                                        <x-book-author>{{$request->requestedBook->author}}</x-book-author>
+                                    </div>
+                                    <div>
+                                        <x-book-isbn>{{$request->requestedBook->ISBN}}</x-book-isbn>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-auto justify-end items-center">
+                                <div class="flex flex-col pr-5">
+                                    <x-button href="/trades/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->ISBN}}/{{$request->proposedBook->ISBN}}" class="mb-3">Accetta</x-button>
+                                    <x-button href="/trades/requests/refuse/{{$request->sender->id}}/{{$request->requestedBook->ISBN}}/{{$request->proposedBook->ISBN}}">Rifiuta</x-button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
         </div>
+    </div>
     </body>
 </html>
