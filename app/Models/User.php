@@ -52,9 +52,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Book::class, relatedKey: 'ISBN');
     }
 
-    public function receivedTradeRequests(): HasMany
+    public function pendingReceivedTradeRequests(): HasMany
     {
-       return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->with(['sender', 'requestedBook', 'proposedBook']);
+       return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
     }
 
 }
