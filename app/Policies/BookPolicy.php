@@ -13,10 +13,10 @@ class BookPolicy
      */
     public function addBookOnLoan(User $user, Book $book): bool
     {
-        return(Auth::user()->is($user) && !$book->users()
+        return Auth::user()->is($user) && !$book->users()
                 ->where('user_id', $user->id)
                 ->wherePivot('onLoan', true)
-                ->exists());
+                ->exists();
     }
 
     /**
@@ -24,9 +24,9 @@ class BookPolicy
      */
     public function removeBookOnLoan(User $user, Book $book): bool
     {
-        return (Auth::user()->is($user) && $book->users()
+        return Auth::user()->is($user) && $book->users()
                 ->where('user_id', $user->id)
                 ->wherePivot('onLoan', true)
-                ->exists());
+                ->exists();
     }
 }

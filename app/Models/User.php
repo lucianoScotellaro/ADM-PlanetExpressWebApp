@@ -52,7 +52,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Book::class, relatedKey: 'ISBN')
             ->withTimestamps()
-            ->withPivot('onLoan');
+            ->withPivot('onLoan')
+            ->withPivot('onTrade');
     }
 
     public function booksOnLoan(): Collection
@@ -63,5 +64,10 @@ class User extends Authenticatable
     public function pendingReceivedTradeRequests(): HasMany
     {
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
+    }
+
+    public function booksOnTrade(): Collection
+    {
+        return $this->books()->wherePivot('onTrade', 1)->get();
     }
 }
