@@ -36,6 +36,10 @@ uses(
 |
 */
 
+expect()->extend('toBeOne', function () {
+    return $this->toBe(1);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -66,19 +70,19 @@ function bookWithUsers():array
 }
 
 //User utils functions
-function userWithBooks():array
+function userWithBooks():User
 {
     $user = User::factory()->create();
+    $books = Book::factory(10)->create();
 
-    $books = Book::factory(5)->create();
-    $books->each(function ($book) use ($user) {
-       $user->books()->attach($book->ISBN);
+    $books->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->ISBN, ['onLoan'=>fake()->boolean]);
     });
-
-    return ['user' => $user, 'books' => $books];
+    return $user;
 }
 
-function login(User $user = null)
+function login ($user = null)
 {
     return test()->actingAs($user ?? User::factory()->create());
 }

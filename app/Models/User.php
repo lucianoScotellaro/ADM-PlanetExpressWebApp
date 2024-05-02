@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -47,14 +48,20 @@ class User extends Authenticatable
         ];
     }
 
-    public function books():BelongsToMany
+    public function books(): BelongsToMany
     {
-        return $this->belongsToMany(Book::class, relatedKey: 'ISBN');
+        return $this->belongsToMany(Book::class, relatedKey: 'ISBN')
+            ->withTimestamps()
+            ->withPivot('onLoan');
+    }
+
+    public function booksOnLoan(): Collection
+    {
+        return $this->books()->wherePivot('onLoan', 1)->get();
     }
 
     public function pendingReceivedTradeRequests(): HasMany
     {
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
     }
-
 }

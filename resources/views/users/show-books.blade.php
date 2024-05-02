@@ -27,11 +27,16 @@
                                         <div>
                                             <x-book-isbn>{{$book->ISBN}}</x-book-isbn>
                                         </div>
+                                        <form action="/users/{{ $user->id }}/books/{{ $book->ISBN }}/onloan" method="POST" id="delete-book-{{ $book->ISBN }}-on-loan" class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex basis-1/6 justify-items-center items-center">
                                 <div class="flex flex-col w-2/3">
+                                    <x-form-button form="delete-book-{{ $book->ISBN }}-on-loan">Delete</x-form-button>
                                     <x-button href="/loan/{{$user->id}}/{{$book->ISBN}}" class="mb-10">Richiedi Prestito</x-button>
                                     <x-button href="/trades/ask/{{$user->id}}/{{$book->ISBN}}">Proponi Scambio</x-button>
                                 </div>
@@ -41,6 +46,7 @@
                     @endforeach
                 </ul>
             </div>
+            <x-button href="/users/{{ $user->id }}/books/onloan/create">Add book on loan</x-button>
         </div>
     </body>
 </html>
