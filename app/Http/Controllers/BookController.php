@@ -18,7 +18,6 @@ class BookController extends Controller
 
         /* Search book implementation */
 
-        return view('books.search-results', ['user'=>Auth::user(), 'books'=>Book::all()]);
+        return view('books.search-results', ['user'=>User::find(1), 'books'=>Book::all()]);
     }
-
 }

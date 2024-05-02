@@ -13,45 +13,69 @@ use Illuminate\Routing\Redirector;
 
 class UserController extends Controller
 {
-    public function showBooks(User $user): Factory|View|Application
+    public function showBooks(User $user, String $state=null): Factory|View|Application
     {
-        return view('users.show-books', ['user'=>$user, 'books'=>$user->books]);
+        if($state === 'onloan')
+        {
+            return view('users.show-books', ['user' => $user, 'books' => $user->booksOnLoan()]);
+        }
+        elseif ($state === 'ontrade')
+        {
+            return view('users.show-books', ['user' => $user, 'books' => $user->booksOnTrade()]);
+        }
+        else
+        {
+           return view('users.show-books', ['user' => $user, 'books' => $user->books]);
+        }
     }
 
-    public function showBooksOnLoan(User $user): View|\Illuminate\Foundation\Application|Factory|Application
-    {
-        return view('users.show-books', ['user'=>$user, 'books'=>$user->booksOnLoan()]);
-    }
-
-    public function booksOnLoanCreate():View|Factory|Application
+    public function booksCreate():View|Factory|Application
     {
         return BookController::searchForm();
     }
 
-    public function addBookOnLoan(User $user, Book $book): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
+    public function addBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
-        try
+        if(in_array($state, ['onloan','ontrade']))
         {
-            $user->books()->attach($book->ISBN, ['onLoan'=>true]);
-            $message = 'Book added successfully';
+            try
+            {
+                $user->books()->attach($book->ISBN, [$state=>true]);
+                $message = 'Book added successfully';
+            }
+            catch (Exception $exception)
+            {
+                $user->books()->updateExistingPivot($book->ISBN, [$state=>true]);
+                $message = 'Book updated successfully';
+            }
+            return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
         }
-        catch (Exception $exception)
-        {
-            $message = 'Book already added';
-        }
-        return redirect('/users/'.$user->id.'/books/onloan')->with('message', $message);
+        return redirect('/users/'.$user->id.'/books')->with('message', 'Invalid URL');
     }
 
-    public function removeBookOnLoan(User $user, Book $book): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
+    public function removeBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
-
-            $removed = $user->books()->detach($book->ISBN);
+        if(in_array($state, ['onloan','ontrade']))
+        {
+            $removed = $user->books()->updateExistingPivot($book->ISBN, [$state=>false]);
             $message = 'Book removed successfully';
 
             if(!$removed){
-                $message = 'Book not in loans list';
+                $message = 'Book not in your list';
             }
 
-        return redirect('/users/'.$user->id.'/books/onloan')->with('message', $message);
+            $this->cleanBookUser($user);
+
+            return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
+        }
+        return redirect('/users/'.$user->id.'/books')->with('message', 'Invalid URL');
+    }
+
+    private function cleanBookUser(User $user): void
+    {
+        $user->books()
+            ->wherePivot('onLoan', false)
+            ->wherePivot('onTrade', false)
+            ->delete();
     }
 }

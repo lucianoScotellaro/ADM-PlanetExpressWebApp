@@ -51,11 +51,17 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Book::class, relatedKey: 'ISBN')
             ->withTimestamps()
-            ->withPivot('onLoan');
+            ->withPivot('onLoan')
+            ->withPivot('onTrade');
     }
 
     public function booksOnLoan(): Collection
     {
         return $this->books()->wherePivot('onLoan', 1)->get();
+    }
+
+    public function booksOnTrade(): Collection
+    {
+        return $this->books()->wherePivot('onTrade', 1)->get();
     }
 }
