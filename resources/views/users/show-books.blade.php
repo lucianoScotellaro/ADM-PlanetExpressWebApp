@@ -10,16 +10,23 @@
 </head>
     <body>
         <div class="flex justify-between">
-            <x-page-header>
-                @if(request()->is('users/*/books/ontrade'))
-                    Libri in scambio
-                @elseif(request()->is('users/*/books/onloan'))
-                    Libri in prestito
-                @elseif(request()->is('users/*/books*'))
-                    I tuoi libri
-                @endif
-            </x-page-header>
-            <x-button class="rounded-md mr-3 mt-4" href="/users/user/books/create">Aggiungi libro</x-button>
+            <div>
+                <x-page-header>
+                    @if(request()->is('users/*/books/ontrade'))
+                        Libri in scambio
+                    @elseif(request()->is('users/*/books/onloan'))
+                        Libri in prestito
+                    @elseif(request()->is('users/*/books*'))
+                        I tuoi libri
+                    @endif
+                </x-page-header>
+            </div>
+            <div>
+                <x-button class="rounded-md mr-3 mt-4" href="/users/{{$user->id}}/books">I miei libri</x-button>
+                <x-button class="rounded-md mr-3 mt-4" href="/users/{{$user->id}}/books/onloan">I miei libri in prestito</x-button>
+                <x-button class="rounded-md mr-3 mt-4" href="/users/{{$user->id}}/books/ontrade">I miei libri in scambio</x-button>
+                <x-button class="rounded-md mr-3 mt-4" href="/users/user/books/create">Aggiungi libro</x-button>
+            </div>
         </div>
         <div class="flex flex-row">
             <div class="basis-1/4">
