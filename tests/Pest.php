@@ -53,9 +53,9 @@ expect()->extend('toBeOne', function () {
 function userWithBooks():User
 {
     $user = User::factory()->create();
-    Book::factory(10)->create();
+    $books = Book::factory(10)->create();
 
-    Book::all()->each(function ($book) use ($user)
+    $books->each(function ($book) use ($user)
     {
         $user->books()->attach($book->ISBN, ['onLoan'=>fake()->boolean]);
     });

@@ -3,15 +3,21 @@
 use App\Models\User;
 use App\Models\Book;
 
+it("should return all the only user's books", function ()
+{
+    $user = userWithBooks();
+    $books = Book::latest()->take(10)->get();
+
+    expect($user->books()->pluck('ISBN') == $books->pluck('ISBN'))->toBeTrue();
+});
+
 it("should return user's books with on loan property", function ()
 {
     $user = userWithBooks();
 
     $user->books()->each(function ($book)
     {
-        expect($book)
-            ->getAttributes()->toBe(Book::find($book->ISBN)->getAttributes())
-            ->pivot->onLoan->not->toBeNull();
+        expect($book->pivot->onLoan)->not->toBeNull();
     });
 });
 
