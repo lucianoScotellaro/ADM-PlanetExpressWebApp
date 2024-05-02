@@ -44,7 +44,6 @@ class UserController extends Controller
 
     public function removeBookOnLoan(User $user, Book $book): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
-
             $removed = $user->books()->detach($book->ISBN);
             $message = 'Book removed successfully';
 

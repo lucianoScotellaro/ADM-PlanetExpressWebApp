@@ -52,21 +52,16 @@ expect()->extend('toBeOne', function () {
 */
 
 // Book utils functions
-function bookWithUsers():array
+function bookWithUsers():Book
 {
-    $book = Book::factory()->create([
-        'title' => 'Divina Commedia',
-        'author' => 'Dante Alighieri',
-        'ISBN' => 9788809612921
-    ]);
-
+    $book = Book::factory()->create();
     $users = User::factory(5)->create();
 
     $users->each(function ($user) use ($book) {
-        $book->users()->attach($user->id);
+        $book->users()->attach($user->id, ['onLoan'=>fake()->boolean]);
     });
 
-    return ['book' => $book, 'users' => $users];
+    return $book;
 }
 
 //User utils functions

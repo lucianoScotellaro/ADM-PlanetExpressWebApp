@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Book;
 use App\Models\TradeRequest;
 
@@ -12,26 +11,26 @@ it("should return all the only user's books", function ()
 });
 
 it('returns users\'s pending received trade requests', function (){
-    $senderWithBooks = userWithBooks();
-    $receiverWithBooks = userWithBooks();
+    $sender = userWithBooks();
+    $receiver = userWithBooks();
 
     $pendingRequest = TradeRequest::create([
-        'sender_id'=>$senderWithBooks['user']->id,
-        'receiver_id'=>$receiverWithBooks['user']->id,
-        'requested_book_ISBN'=>$receiverWithBooks['books']->first()->ISBN,
-        'proposed_book_ISBN'=>$senderWithBooks['books']->first()->ISBN,
+        'sender_id'=>$sender->id,
+        'receiver_id'=>$receiver->id,
+        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
+        'proposed_book_ISBN'=>$sender->books()->first()->ISBN,
         'response'=>null
     ]);
 
     $resolvedRequest = TradeRequest::create([
-        'sender_id'=>$senderWithBooks['user']->id,
-        'receiver_id'=>$receiverWithBooks['user']->id,
-        'requested_book_ISBN'=>$receiverWithBooks['books']->last()->ISBN,
-        'proposed_book_ISBN'=>$senderWithBooks['books']->last()->ISBN,
+        'sender_id'=>$sender->id,
+        'receiver_id'=>$receiver->id,
+        'requested_book_ISBN'=>$receiver->books()->get()->last()->ISBN,
+        'proposed_book_ISBN'=>$sender->books()->get()->last()->ISBN,
         'response'=>true
     ]);
 
-    $pendingReceivedTradeRequests = $receiverWithBooks['user']->pendingReceivedTradeRequests()->get();
+    $pendingReceivedTradeRequests = $receiver->pendingReceivedTradeRequests()->get();
 
     expect($pendingReceivedTradeRequests->count())->toBe(1)
         ->and($pendingReceivedTradeRequests->first()->sender->id == $pendingRequest->sender->id)

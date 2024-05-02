@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\User;
+
 it('should return book\'s users', function(){
-    $bookWithUsers = bookWithUsers();
-    expect($bookWithUsers['book']->users()->pluck('id') == $bookWithUsers['users']->pluck('id'))
+    $book = bookWithUsers();
+    $users = User::latest()->take(5)->get();
+    expect($book->users()->pluck('id') == $users->pluck('id'))
         ->toBeTrue();
 });
