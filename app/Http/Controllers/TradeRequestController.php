@@ -35,16 +35,20 @@ class TradeRequestController extends Controller
 
     public function update(User $sender, Book $requestedBook, Book $proposedBook){
         $activeUser = User::find(1);
-        $tradeRequest = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->ISBN, $requestedBook->ISBN]);
+        $request = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->ISBN, $requestedBook->ISBN]);
 
         if(request()->is('trades/requests/accept/*')){
-            $tradeRequest->update([
+            $request->update([
                 'response'=>true
             ]);
-        }else{
-            $tradeRequest->update([
+            session(['success'=>'Richiesta accettata correttamente']);
+        }elseif('trades/requests/refuse/*'){
+            $request->update([
                'response'=>false
             ]);
+            session(['success'=>'Richiesta rifiutata correttamente']);
+        }else{
+            abort(405);
         }
 
         return redirect('/trades/requests/received/'.$activeUser->id);
