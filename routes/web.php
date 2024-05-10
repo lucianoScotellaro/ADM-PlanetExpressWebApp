@@ -44,9 +44,9 @@ Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [T
     ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
 
 //Loans
-Route::get('/loans/requests/received/{user}', [LoanRequestController::class, 'index'])
+Route::get('/loans/requests/received/{receiver}', [LoanRequestController::class, 'index'])
     ->middleware('auth')
-    ->can('seePendingRequests', [LoanRequest::class, 'user']);
+    ->can('seePendingRequests', [LoanRequest::class, 'receiver']);
 
 Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])
     ->middleware('auth')

@@ -10,7 +10,7 @@ it('renders user\'s pending received trade requests', function () {
         ->assertViewIs('trades.received.index');
 });
 
-it('doesn\'t render another user\'s pending received trade requests', function () {
+it('doesn\'t render another user\'s pending received trade requests page', function () {
     $user = User::factory()->create();
     $anotherUser = User::factory()->create();
     login($user)->get('trades/requests/received/'.$anotherUser->id)
@@ -73,12 +73,12 @@ it('can accept or refuse pending trade request',function(string $action){
         ->assertSessionHas('success')
         ->assertRedirect('/trades/requests/received/'.$receiver->id);
 
-    $tradeRequest = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->ISBN, $receiver->books()->first()->ISBN]);
+    $request = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->ISBN, $receiver->books()->first()->ISBN]);
 
     if($action == 'accept'){
-        expect($tradeRequest->response)->toBe(1);
+        expect($request->response)->toBe(1);
     }elseif($action == 'refuse'){
-        expect($tradeRequest->response)->toBe(0);
+        expect($request->response)->toBe(0);
     }
 
 })->with([

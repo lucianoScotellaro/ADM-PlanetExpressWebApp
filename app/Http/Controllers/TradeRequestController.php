@@ -41,14 +41,12 @@ class TradeRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            session(['success'=>'Richiesta accettata correttamente']);
+            session(['success'=>'Richiesta accettata con successo']);
         }elseif('trades/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            session(['success'=>'Richiesta rifiutata correttamente']);
-        }else{
-            abort(405);
+            session(['success'=>'Richiesta rifiutata con successo']);
         }
 
         return redirect('/trades/requests/received/'.$activeUser->id);
