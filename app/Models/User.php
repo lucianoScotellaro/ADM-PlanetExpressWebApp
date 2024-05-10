@@ -66,6 +66,11 @@ class User extends Authenticatable
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
     }
 
+    public function pendingReceivedLoanRequests():HasMany
+    {
+        return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);
+    }
+
     public function booksOnTrade(): Collection
     {
         return $this->books()->wherePivot('onTrade', 1)->get();
