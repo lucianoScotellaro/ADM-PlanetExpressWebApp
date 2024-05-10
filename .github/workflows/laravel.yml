@@ -8,7 +8,7 @@ on:
 
 jobs:
   laravel-tests:
-
+    name: CI Tests
     runs-on: ubuntu-latest
 
     steps:
