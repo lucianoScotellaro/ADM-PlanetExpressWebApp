@@ -23,17 +23,17 @@ Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'rem
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades
-Route::get('/trades/requests/received/{user}', [TradeRequestController::class, 'index'])
+Route::get('/trades/requests/received/{receiver}', [TradeRequestController::class, 'index'])
     ->middleware('auth')
-    ->can('seePendingRequests', [TradeRequest::class, 'user']);
+    ->can('seePendingRequests', [TradeRequest::class, 'receiver']);
 
-Route::get('/trades/ask/{user}/{book}', [TradeRequestController::class, 'show'])
+Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
     ->middleware('auth')
-    ->can('requestBook', [TradeRequest::class, 'user']);
+    ->can('requestBook', [TradeRequest::class, 'receiver']);
 
-Route::post('/trades/propose/{book}', [TradeRequestController::class, 'store'])
+Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store'])
     ->middleware('auth')
-    ->can('proposeBook', [TradeRequest::class, 'book']);
+    ->can('proposeBook', [TradeRequest::class, 'proposedBook']);
 
 Route::get('/trades/requests/accept/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
     ->middleware('auth')

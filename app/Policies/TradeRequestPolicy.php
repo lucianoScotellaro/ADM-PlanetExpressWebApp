@@ -9,24 +9,24 @@ use Illuminate\Support\Facades\Auth;
 
 class TradeRequestPolicy
 {
-    public function seePendingRequests(User $user):bool
+    public function seePendingRequests(User $user, User $receiver):bool
     {
-        return Auth::user()->is($user);
+        return $user->is($receiver);
     }
 
-    public function requestBook(User $user):bool
+    public function requestBook(User $user, User $receiver):bool
     {
-        return !Auth::user()->is($user);
+        return !$user->is($receiver);
     }
 
-    public function proposeBook(Book $book):bool
+    public function proposeBook(User $user, Book $proposedBook):bool
     {
-        return Auth::user()->books()->contains($book);
+        return $user->books->contains($proposedBook);
     }
 
-    public function resolveRequest(User $sender, Book $requestedBook, Book $proposedBook):bool
+    public function resolveRequest(User $user, User $sender, Book $requestedBook, Book $proposedBook):bool
     {
-        $request = TradeRequest::find([$sender->id, Auth::id(), $proposedBook->ISBN, $requestedBook->ISBN])->with('receiver');
-        return $request != null && $request->response == null && Auth::user()->is($request->receiver);
+        $request = TradeRequest::find([$sender->id, $user->id, $proposedBook->ISBN, $requestedBook->ISBN]);
+        return $request != null && $request->response === null;
     }
 }
