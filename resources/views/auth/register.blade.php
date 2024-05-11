@@ -1,47 +1,75 @@
 <x-layout>
-    <x-slot:header>
-        Planet Express
-    </x-slot:header>
-    <x-slot:title>
-        Register
-    </x-slot:title>
-
-    <div class="flex w-full h-full justify-center items-center">
-        <div class="border-solid border-2 border-black rounded-lg">
-            <div class="bg-gray-300">
-                <form class="m-6" action="/register" method="POST">
-                    @csrf
-                    <x-form-field>
-                        <x-form-label for="name"> Name </x-form-label>
-                        <x-form-input :value="old('name')" type="string" id="name" name="name" required></x-form-input>
-                        <x-form-error name="name"></x-form-error>
-                    </x-form-field>
-
-                    <x-form-field>
-                        <x-form-label for="email"> Email </x-form-label>
-                        <x-form-input :value="old('email')" type="email" id="email" name="email" required></x-form-input>
-                        <x-form-error name="email"></x-form-error>
-                    </x-form-field>
-
-                    <x-form-field>
-                        <x-form-label for="password"> Password </x-form-label>
-                        <x-form-input type="password" id="password" name="password" required></x-form-input>
-                        <x-form-error name="password"></x-form-error>
-                    </x-form-field>
-
-                    <x-form-field>
-                        <x-form-label for="password_confirmation"> Confirm Password </x-form-label>
-                        <x-form-input type="password" id="password_confirmation" name="password_confirmation" required></x-form-input>
-                        <x-form-error name="password_confirmation"></x-form-error>
-                    </x-form-field>
-
-                    <div class="flex justify-center">
-                        <x-form-button class="mt-3"> Register </x-form-button>
-                    </div>
-                </form>
+    <x-slot:navbar>
+        <x-navbar>
+            <div class="nav-button-container">
+                <a class="nav-btn" href="/">Back home</a>
+                <a class="nav-btn" href="/login">Login</a>
             </div>
+        </x-navbar>
+    </x-slot:navbar>
+    <x-slot:header>
+        <div class="page-header">
+            <p>Enter in Planet Express!</p>
         </div>
-    </div>
+    </x-slot:header>
+    <main class="register" style="background-image: url('{{ asset('img/home-background.jpg') }}')">
+        <form action="/register" method="POST" class="signup-form">
+            @csrf
+            <div class="form-header">
+                <p>Register Now!</p>
+                <x-close-form-button></x-close-form-button>
+            </div>
+            <x-form-field>
+                <x-form-label for="name">Name</x-form-label>
+                <x-form-input
+                    type="text"
+                    name="name"
+                    placeholder="Your name..."
+                    :value="old('name')"
+                    required
+                />
+            </x-form-field>
+            <x-form-error name="name"></x-form-error>
+            <x-form-field>
+                <x-form-label for="email">Email</x-form-label>
+                <x-form-input
+                    type="email"
+                    name="email"
+                    placeholder="Your email..."
+                    :value="old('email')"
+                    required
+                />
+            </x-form-field>
+            <x-form-error name="email"></x-form-error>
+            <x-form-field>
+                <x-form-label for="password">Password</x-form-label>
+                <x-form-input
+                    type="password"
+                    name="password"
+                    placeholder="Password..."
+                    :value="old('password')"
+                    required
+                />
+            </x-form-field>
+            <x-form-error name="password"></x-form-error>
+            <x-form-field>
+                <x-form-label for="password_confirmation"
+                >Confirm Password</x-form-label
+                >
+                <x-form-input
+                    type="password"
+                    name="password_confirmation"
+                    placeholder="Confirm password"
+                    required
+                />
+            </x-form-field>
+            <x-form-error name="password_confirmation"></x-form-error>
+            <x-form-button>Register</x-form-button>
+            <p class="form-footer">
+                Already have an account? <a href="/login">Login</a>
+            </p>
+        </form>
+    </main>
 </x-layout>
 
 

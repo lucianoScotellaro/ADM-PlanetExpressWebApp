@@ -1,3 +1,3 @@
-<div class="w-full">
+<div class="form-field">
     {{ $slot }}
 </div>
