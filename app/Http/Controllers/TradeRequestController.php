@@ -15,7 +15,7 @@ class TradeRequestController extends Controller
     }
 
     public function show(User $receiver, Book $requestedBook){
-        session(['receiver'=>$receiver->id,'requestedBook'=>$requestedBook->ISBN]);
+        session(['receiver'=>$receiver->id,'requestedBook'=>$requestedBook->id]);
         $activeUser = User::find(2);
         return view('trades.show-propose',['user'=>$activeUser,'books'=>$activeUser->books]);
     }
@@ -26,8 +26,8 @@ class TradeRequestController extends Controller
         TradeRequest::create([
             'receiver_id'=>session('receiver'),
             'sender_id'=>$activeUser->id,
-            'requested_book_ISBN'=>session('requestedBook'),
-            'proposed_book_ISBN'=>$proposedBook->ISBN
+            'requested_book_id'=>session('requestedBook'),
+            'proposed_book_id'=>$proposedBook->id
         ]);
 
         return redirect('/');
@@ -35,7 +35,7 @@ class TradeRequestController extends Controller
 
     public function update(User $sender, Book $requestedBook, Book $proposedBook){
         $activeUser = User::find(1);
-        $request = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->ISBN, $requestedBook->ISBN]);
+        $request = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->id, $requestedBook->id]);
 
         if(request()->is('trades/requests/accept/*')){
             $request->update([

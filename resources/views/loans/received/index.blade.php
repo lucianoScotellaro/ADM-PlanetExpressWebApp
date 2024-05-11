@@ -46,16 +46,14 @@
                                             <div class="mb-3">
                                                 <p class="text-sm text-semibold">Richiesto da: <strong>{{$request->sender->name}}</strong></p>
                                             </div>
-                                            <div>
-                                                <x-book-isbn>{{$request->requestedBook->ISBN}}</x-book-isbn>
-                                            </div>
+                                            <div></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex basis-1/6 justify-items-center items-center">
                                     <div class="flex flex-col  w-full">
-                                        <x-button class="m-1" href="/loans/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->ISBN}}">Cedi in prestito</x-button>
-                                        <x-button class="m-1" href="/loans/requests/refuse/{{$request->sender->id}}/{{$request->requestedBook->ISBN}}">Respingi richiesta</x-button>
+                                        <x-button class="m-1" href="/loans/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->id}}">Cedi in prestito</x-button>
+                                        <x-button class="m-1" href="/loans/requests/refuse/{{$request->sender->id}}/{{$request->requestedBook->id}}">Respingi richiesta</x-button>
                                     </div>
                                 </div>
                             </div>

@@ -23,36 +23,26 @@ Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'rem
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades
-Route::get('/trades/requests/received/{receiver}', [TradeRequestController::class, 'index'])
-    ->middleware('auth')
-    ->can('seePendingRequests', [TradeRequest::class, 'receiver']);
+Route::get('/trades/requests/received/{receiver}', [TradeRequestController::class, 'index']);
 
-Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
-    ->middleware('auth')
-    ->can('requestBook', [TradeRequest::class, 'receiver']);
 
-Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store'])
-    ->middleware('auth')
-    ->can('proposeBook', [TradeRequest::class, 'proposedBook']);
+Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show']);
 
-Route::get('/trades/requests/accept/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
 
-Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
+Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store']);
+
+
+Route::get('/trades/requests/accept/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update']);
+
+
+Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update']);
+
 
 //Loans
-Route::get('/loans/requests/received/{receiver}', [LoanRequestController::class, 'index'])
-    ->middleware('auth')
-    ->can('seePendingRequests', [LoanRequest::class, 'receiver']);
+Route::get('/loans/requests/received/{receiver}', [LoanRequestController::class, 'index']);
 
-Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [LoanRequest::class, 'sender', 'requestedBook']);
+Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update']);
 
-Route::get('/loans/requests/refuse/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [LoanRequest::class, 'sender', 'requestedBook']);
+
+Route::get('/loans/requests/refuse/{sender}/{requestedBook}', [LoanRequestController::class, 'update']);
 

@@ -39,7 +39,7 @@ it('should render books search form', function ()
 
 it('should add a book on loan or on trade for a user', function (User $user, Book $book, String $state)
 {
-    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->ISBN.'/'.$state);
+    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/'.$state);
     expect($response)
         ->getStatusCode()->toBe(302)
         ->assertRedirect('/users/'.$user->id.'/books/'.$state);
@@ -50,9 +50,9 @@ it('should add a book on loan or on trade for a user', function (User $user, Boo
 
 it('should not fail adding a book already in loans or trades list', function (User $user, Book $book, String $state)
 {
-    $user->books()->attach($book->ISBN, [$state=>true]);
+    $user->books()->attach($book->id, [$state=>true]);
 
-    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->ISBN.'/'.$state);
+    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/'.$state);
     expect($response)
         ->getStatusCode()->toBe(302)
         ->assertRedirect('/users/'.$user->id.'/books/'.$state);
@@ -63,7 +63,7 @@ it('should not fail adding a book already in loans or trades list', function (Us
 
 it("should render user's books page for invalid URL while adding a book", function (User $user, Book $book)
 {
-    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->ISBN.'/random_string');
+    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/random_string');
     expect($response)
         ->getStatusCode()->toBe(302)
         ->assertRedirect('/users/'.$user->id.'/books')
@@ -74,9 +74,9 @@ it("should render user's books page for invalid URL while adding a book", functi
 
 it('should be blocked from adding a book already in loans list', function (User $user, Book $book)
 {
-    $user->books()->attach($book->ISBN, ['onLoan'=>true]);
+    $user->books()->attach($book->id, ['onLoan'=>true]);
 
-    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->ISBN.'/onloan');
+    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/onloan');
     expect($response)
         ->getStatusCode()->toBe(403);
 })->with([
@@ -87,9 +87,9 @@ it('should be blocked from adding a book already in loans list', function (User 
 it('should remove a book from the loans or trades list of the user', function (User $user, String $state)
 {
     $book = Book::factory()->create();
-    $user->books()->attach($book->ISBN, [$state => true]);
+    $user->books()->attach($book->id, [$state => true]);
 
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->ISBN.'/'.$state);
+    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/'.$state);
     expect($response)
         ->getStatusCode()->toBe(302)
         ->assertRedirect('/users/'.$user->id.'/books/'.$state);
@@ -100,7 +100,7 @@ it('should remove a book from the loans or trades list of the user', function (U
 
 it("should render user's books page for invalid URL while removing a book", function (User $user, Book $book)
 {
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->ISBN.'/random_string');
+    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/random_string');
     expect($response)
         ->getStatusCode()->toBe(302)
         ->assertRedirect('/users/'.$user->id.'/books')
@@ -111,7 +111,7 @@ it("should render user's books page for invalid URL while removing a book", func
 
 it('should be blocked from removing a book not in loans list', function (User $user, Book $book)
 {
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->ISBN.'/onloan');
+    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/onloan');
     expect($response)
         ->getStatusCode()->toBe(403);
 })->with([
@@ -120,7 +120,7 @@ it('should be blocked from removing a book not in loans list', function (User $u
 
 it("'should render correct message removing a book not in user's books list", function (User $user, Book $book, String $state)
 {
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->ISBN.'/'.$state);
+    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/'.$state);
     expect($response)
         ->getStatusCode()->toBe(302)
         ->assertRedirect('/users/'.$user->id.'/books/'.$state)

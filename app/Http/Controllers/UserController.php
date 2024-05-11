@@ -40,12 +40,12 @@ class UserController extends Controller
         {
             try
             {
-                $user->books()->attach($book->ISBN, [$state=>true]);
+                $user->books()->attach($book->id, [$state=>true]);
                 $message = 'Book added successfully';
             }
             catch (Exception $exception)
             {
-                $user->books()->updateExistingPivot($book->ISBN, [$state=>true]);
+                $user->books()->updateExistingPivot($book->id, [$state=>true]);
                 $message = 'Book updated successfully';
             }
             return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
@@ -57,7 +57,7 @@ class UserController extends Controller
     {
         if(in_array($state, ['onloan','ontrade']))
         {
-            $removed = $user->books()->updateExistingPivot($book->ISBN, [$state=>false]);
+            $removed = $user->books()->updateExistingPivot($book->id, [$state=>false]);
             $message = 'Book removed successfully';
 
             if(!$removed){

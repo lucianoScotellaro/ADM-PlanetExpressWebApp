@@ -9,8 +9,8 @@ it('returns trade request sender or receiver', function(string $role){
     $request = TradeRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
-        'proposed_book_ISBN'=>$sender->books()->first()->ISBN
+        'requested_book_id'=>$receiver->books()->first()->id,
+        'proposed_book_id'=>$sender->books()->first()->id
     ]);
 
     if($role == 'sender'){
@@ -30,14 +30,14 @@ it('returns trade request requested or proposed book', function(string $role){
     $request = TradeRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
-        'proposed_book_ISBN'=>$sender->books()->first()->ISBN
+        'requested_book_id'=>$receiver->books()->first()->id,
+        'proposed_book_id'=>$sender->books()->first()->id
     ]);
 
     if($role == 'requested'){
-        expect($request->requestedBook->ISBN)->toBe($receiver->books()->first()->ISBN);
+        expect($request->requestedBook->id)->toBe($receiver->books()->first()->id);
     }elseif($role == 'proposed'){
-        expect($request->proposedBook->ISBN)->toBe($sender->books()->first()->ISBN);
+        expect($request->proposedBook->id)->toBe($sender->books()->first()->id);
     }
 })->with([
     'requested',

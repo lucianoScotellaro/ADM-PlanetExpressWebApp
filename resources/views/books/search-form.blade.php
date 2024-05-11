@@ -9,9 +9,11 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        <form method="GET" action="/books/search" class="hidden" id="search-book">
+        <form method="GET" action="/books/search">
             @csrf
+            <input type="text" name="title" id="title" placeholder="Title" />
+            <input type="text" name="author" id="author" placeholder="Author" />
+            <x-form-button>Search</x-form-button>
         </form>
-        <x-form-button form="search-book">Search</x-form-button>
     </body>
 </html>

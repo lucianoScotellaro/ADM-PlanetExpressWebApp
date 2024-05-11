@@ -11,8 +11,8 @@ class Book extends Model
     use HasFactory;
 
     protected $guarded = [];
-
-    protected $primaryKey = 'ISBN';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     public function users(): BelongsToMany
     {

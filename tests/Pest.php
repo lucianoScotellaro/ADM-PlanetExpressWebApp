@@ -72,7 +72,7 @@ function userWithBooks():User
 
     $books->each(function ($book) use ($user)
     {
-        $user->books()->attach($book->ISBN, ['onLoan'=>fake()->boolean]);
+        $user->books()->attach($book->id, ['onLoan'=>fake()->boolean]);
     });
     return $user;
 }

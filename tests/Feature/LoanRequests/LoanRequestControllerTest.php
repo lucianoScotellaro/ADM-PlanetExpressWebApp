@@ -22,19 +22,19 @@ it('can accept or refuse a pending loan request', function(string $action){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
-    LoanRequest::create([
+    $pendingRequest = LoanRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
+        'requested_book_id'=>$receiver->books()->first()->id,
         'response'=>null
     ]);
 
-    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->ISBN)
+    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id)
         ->assertStatus(302)
         ->assertSessionHas('success')
         ->assertRedirect('/loans/requests/received/'.$receiver->id);
 
-    $request = LoanRequest::find([$receiver->id, $sender->id, $receiver->books()->first()->ISBN]);
+    $request = LoanRequest::find([$receiver->id, $sender->id, $receiver->books()->first()->id]);
 
     if($action == 'accept'){
         expect($request->response)->toBe(1);
@@ -53,11 +53,11 @@ it('cannot accept or refuse a resolved loan request', function(string $action, b
     LoanRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
+        'requested_book_id'=>$receiver->books()->first()->id,
         'response'=>$response
     ]);
 
-    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->ISBN)
+    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id)
         ->assertStatus(403);
 })->with([
     'accept',
@@ -71,7 +71,7 @@ it('cannot accept or refuse a non-existent loan request', function(string $actio
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
-    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->ISBN)
+    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id)
         ->assertStatus(403);
 })->with([
     'accept',

@@ -17,18 +17,17 @@
                         </div>
                         <div>
                             <x-book-title>{{ $book->title }}</x-book-title>
-                            <x-book-isbn>{{ $book->ISBN }}</x-book-isbn>
                         </div>
                     </div>
                     <div class="flex basis-1/2 justify-end mb-3">
-                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book->ISBN }}/onloan" id="add-book-{{ $book->ISBN }}-on-loan" class="hidden">
+                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book->id }}/onloan" id="add-book-{{ $book->id }}-on-loan" class="hidden">
                             @csrf
                         </form>
-                        <x-form-button class="m-2" form="add-book-{{ $book->ISBN }}-on-loan">Aggiungi libro nei prestiti</x-form-button>
-                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book->ISBN }}/ontrade" id="add-book-{{ $book->ISBN }}-on-trade" class="hidden">
+                        <x-form-button class="m-2" form="add-book-{{ $book->id }}-on-loan">Aggiungi libro nei prestiti</x-form-button>
+                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" id="add-book-{{ $book->id }}-on-trade" class="hidden">
                             @csrf
                         </form>
-                        <x-form-button class="m-2" form="add-book-{{ $book->ISBN }}-on-trade">Aggiungi libro in scambio</x-form-button>
+                        <x-form-button class="m-2" form="add-book-{{ $book->id }}-on-trade">Aggiungi libro in scambio</x-form-button>
                     </div>
                 </div>
             @endforeach
