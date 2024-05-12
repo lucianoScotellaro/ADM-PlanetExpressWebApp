@@ -64,8 +64,12 @@ main{
     background-position: bottom right;
 }
 
-.register{
+.register, .login{
     top: -13vh;
+}
+
+.login{
+    background-position: bottom;
 }
 
 .page-header{
