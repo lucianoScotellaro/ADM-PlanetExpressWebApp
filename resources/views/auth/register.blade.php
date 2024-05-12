@@ -17,7 +17,6 @@
             @csrf
             <div class="form-header">
                 <p>Register Now!</p>
-                <x-close-form-button></x-close-form-button>
             </div>
             <x-form-field>
                 <x-form-label for="name">Name</x-form-label>
