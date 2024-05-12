@@ -9,25 +9,25 @@ use Illuminate\Http\Request;
 
 class TradeRequestController extends Controller
 {
-    public function index(User $user)
+    public function index(User $receiver)
     {
-        return view('trades.received.index', ['requests'=>$user->pendingReceivedTradeRequests]);
+        return view('trades.received.index', ['requests'=>$receiver->pendingReceivedTradeRequests]);
     }
 
-    public function show(User $user, Book $book){
-        session(['receiver'=>$user->id,'requestedBook'=>$book->ISBN]);
+    public function show(User $receiver, Book $requestedBook){
+        session(['receiver'=>$receiver->id,'requestedBook'=>$requestedBook->ISBN]);
         $activeUser = User::find(2);
         return view('trades.show-propose',['user'=>$activeUser,'books'=>$activeUser->books]);
     }
 
-    public function store(Book $book){
+    public function store(Book $proposedBook){
         $activeUser = User::find(2);
 
         TradeRequest::create([
             'receiver_id'=>session('receiver'),
             'sender_id'=>$activeUser->id,
             'requested_book_ISBN'=>session('requestedBook'),
-            'proposed_book_ISBN'=>$book->ISBN
+            'proposed_book_ISBN'=>$proposedBook->ISBN
         ]);
 
         return redirect('/');
@@ -35,16 +35,18 @@ class TradeRequestController extends Controller
 
     public function update(User $sender, Book $requestedBook, Book $proposedBook){
         $activeUser = User::find(1);
-        $tradeRequest = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->ISBN, $requestedBook->ISBN]);
+        $request = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->ISBN, $requestedBook->ISBN]);
 
         if(request()->is('trades/requests/accept/*')){
-            $tradeRequest->update([
+            $request->update([
                 'response'=>true
             ]);
-        }else{
-            $tradeRequest->update([
+            session(['success'=>'Richiesta accettata con successo']);
+        }elseif('trades/requests/refuse/*'){
+            $request->update([
                'response'=>false
             ]);
+            session(['success'=>'Richiesta rifiutata con successo']);
         }
 
         return redirect('/trades/requests/received/'.$activeUser->id);
