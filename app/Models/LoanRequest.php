@@ -4,30 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Thiagoprz\CompositeKey\HasCompositeKey;
 
-class TradeRequest extends Model
+class LoanRequest extends Model
 {
     use HasFactory;
     use HasCompositeKey;
 
-    protected $table = 'trade_requests';
     protected $guarded = [];
-    protected $primaryKey = ['sender_id', 'receiver_id', 'proposed_book_ISBN', 'requested_book_ISBN'];
+    protected $primaryKey = ['receiver_id', 'sender_id', 'requested_book_ISBN'];
 
-    public function sender(){
+    public function sender(): BelongsTo
+    {
         return $this->belongsTo(User::class, foreignKey: 'sender_id');
     }
 
-    public function receiver(){
+    public function receiver(): BelongsTo
+    {
         return $this->belongsTo(User::class, foreignKey: 'receiver_id');
     }
 
-    public function requestedBook(){
+    public function requestedBook(): BelongsTo
+    {
         return $this->belongsTo(Book::class, foreignKey: 'requested_book_ISBN');
-    }
-
-    public function proposedBook(){
-        return $this->belongsTo(Book::class, foreignKey: 'proposed_book_ISBN');
     }
 }
