@@ -6,7 +6,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +32,7 @@ class SessionController extends Controller
         else
         {
             throw ValidationException::withMessages([
-                'credentials-error' => ['Your email or password is incorrect. Please try again.'],
+                'credentials-error' => 'Your email or password is incorrect. Please try again.'
             ]);
         }
     }
