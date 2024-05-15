@@ -13,6 +13,11 @@ use Illuminate\Routing\Redirector;
 
 class UserController extends Controller
 {
+    public function show(User $user)
+    {
+        return view('users.show', ['user' => $user]);
+    }
+
     public function showBooks(User $user, String $state=null): Factory|View|Application
     {
         if($state === 'onloan')

@@ -4,6 +4,15 @@
 use App\Models\Book;
 use App\Models\User;
 
+it("should render user profile page", function (User $user){
+
+    login($user)->get('/users/1')
+        ->assertStatus(200)
+        ->assertViewIs('users.show');
+})->with([
+    fn() => User::factory()->create()
+]);
+
 it("should render a page with all the user's books", function (User $user)
 {
     $response = login()->get('/users/'.$user->id.'/books');
