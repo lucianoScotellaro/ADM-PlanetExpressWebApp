@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\LoanRequestController;
 use App\Http\Controllers\TradeRequestController;
 use App\Http\Controllers\UserController;
@@ -9,13 +11,20 @@ use App\Models\TradeRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 
 //Users
 Route::get('/users/search/form', [UserController::class, 'searchForm']);
 Route::get('/users/search', [UserController::class, 'search']);
 Route::get('users/search/proposers/{book}', [UserController::class, 'showProposers']);
+
+//Auth
+Route::get('/register', [RegisteredUserController::class, 'create']);
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::get('/login', [SessionController::class, 'create']);
+Route::post('/login', [SessionController::class, 'store']);
+Route::post('/logout', [SessionController::class, 'destroy']);
 
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
