@@ -19,6 +19,7 @@ class BookFactory extends Factory
         return [
             'title'=>fake()->sentence(),
             'author'=>fake()->name(),
+            'category'=>fake()->word(),
             'id'=>fake()->unique()->word()
         ];
     }

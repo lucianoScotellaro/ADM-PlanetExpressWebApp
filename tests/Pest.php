@@ -76,6 +76,17 @@ function userWithBooks():User
     });
     return $user;
 }
+function userWithTradeableBooks():User
+{
+    $user = User::factory()->create();
+    $books = Book::factory(10)->create();
+
+    $books->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->id, ['onTrade'=>true]);
+    });
+    return $user;
+}
 
 function login ($user = null)
 {

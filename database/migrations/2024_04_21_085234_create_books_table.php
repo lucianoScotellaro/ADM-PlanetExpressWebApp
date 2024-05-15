@@ -15,8 +15,14 @@ return new class extends Migration
 
             $table->string("id")->primary();
             $table->string('title');
-            $table->string('author');
+            $table->string('author')->nullable()->default(null);
+            $table->text('description')->nullable()->default(null);
+            $table->string('category')->nullable()->default(null);
+            $table->string('publishedDate')->nullable()->default(null);
+            $table->string('thumbnailUrl')->nullable()->default(null);
+            $table->integer('pageCount')->nullable()->default(null);
             $table->timestamps();
+
         });
     }
 

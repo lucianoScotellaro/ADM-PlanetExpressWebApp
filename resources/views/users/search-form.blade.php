@@ -9,7 +9,12 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        <form method="GET" action="/books/search">
+        <form method="GET" action="/users/search">
+            <select name="searchOn" id="searchOn">
+                <option selected disabled>Cerca per</option>
+                <option value="requestedBook">Libro richiesto</option>
+                <option value="proposedBook">Libro proposto</option>
+            </select>
             <input type="text" name="title" id="title" placeholder="Title" />
             <input type="text" name="author" id="author" placeholder="Author" />
             <input type="text" name="category" id="category" placeholder="Category" />
