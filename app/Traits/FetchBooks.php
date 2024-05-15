@@ -64,6 +64,8 @@ trait FetchBooks
                     $requestURL .= 'subject:' . $value . '+';
                     break;
                 }
+            default:
+                break;
         }
         return $requestURL;
     }
@@ -87,17 +89,16 @@ trait FetchBooks
     {
         $response = json_decode(Http::get('https://www.googleapis.com/books/v1/volumes/'.$bookID));
         $bookInfo = $response->volumeInfo;
-        $bookData = array(
+        $fallbackString = 'Not Available';
+        return array(
             'id' => $response->id,
             'title' => $bookInfo->title,
-            'author' => property_exists($bookInfo,'authors') ? $bookInfo->authors[0] : 'Not Available',
-            'description' => property_exists($bookInfo,'description') ? $bookInfo->description : 'Not Available',
+            'author' => property_exists($bookInfo,'authors') ? $bookInfo->authors[0] : $fallbackString,
+            'description' => property_exists($bookInfo,'description') ? $bookInfo->description : $fallbackString,
             'category' => property_exists($bookInfo,'categories') ? $bookInfo->categories[0] : null,
-            'publishedDate' => property_exists($bookInfo,'publishedDate') ? $bookInfo->publishedDate : 'Not Available',
+            'publishedDate' => property_exists($bookInfo,'publishedDate') ? $bookInfo->publishedDate : $fallbackString,
             'thumbnailUrl' => property_exists($bookInfo,'imageLinks') && property_exists($bookInfo->imageLinks,'thumbnail') ? $bookInfo->imageLinks->thumbnail : null,
-            'pageCount' => property_exists($bookInfo,'pageCount') ? $bookInfo->pageCount : 'Not Available'
+            'pageCount' => property_exists($bookInfo,'pageCount') ? $bookInfo->pageCount : $fallbackString
         );
-
-        return $bookData;
     }
 }
