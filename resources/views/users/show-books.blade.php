@@ -11,7 +11,9 @@
             </x-navbar-links-list>
             <div class="nav-button-container">
                 @auth
+                    @can('editBooks', [\App\Models\Book::class, $user])
                     <a class="nav-btn" href="/users/user/books/create">Add book</a>
+                    @endcan
                 @endauth
             </div>
         </x-navbar>
@@ -50,21 +52,25 @@
                     <div class="book-info-container">
                         <p>Title: {{ $book->title }}</p>
                         <p>Author: {{ $book->author }}</p>
-                        <p>{{ $book->id }}</p>
+                        <p>ID: {{ $book->id }}</p>
                     </div>
                     <div class="book-actions-container">
+                        @can('editBooks', [\App\Models\Book::class, $user])
                         <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onloan" method="POST" id="delete-book-{{ $book->id }}-on-loan" hidden>
                             @csrf
                             @method('DELETE')
                         </form>
-                        <x-form-button form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-form-button>
+                        <x-button type="submit" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-button>
                         <form action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" method="POST" id="delete-book-{{ $book->id }}-on-trade" hidden>
                             @csrf
                             @method('DELETE')
                         </form>
-                        <x-form-button form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
+                        <x-button type="submit" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-button>
+                        @endcan
+                        @cannot('editBooks', [\App\Models\Book::class, $user])
                         <x-button href="/loan/{{$user->id}}/{{$book->ISBN}}">Request on loan</x-button>
-                        <x-button href="/trades/ask/{{$user->id}}/{{$book->ISBN}}">Suggest trade</x-button>
+                        <x-button href="/trades/ask/{{$user->id}}/{{$book->ISBN}}">Request on trade</x-button>
+                            @endcannot
                     </div>
                 </li>
             @endforeach

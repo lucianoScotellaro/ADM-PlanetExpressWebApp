@@ -29,7 +29,7 @@ Route::post('/logout', [SessionController::class, 'destroy']);
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
 Route::get('/users/{user}', [UserController::class, 'show']);
-Route::get('/users/{user}/books', [UserController::class, 'showBooks']);
+Route::get('/users/{user}/books', [UserController::class, 'showBooks'])->middleware('auth');
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
 
 Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook']);

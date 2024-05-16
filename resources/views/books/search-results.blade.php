@@ -1,53 +1,66 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Planet Express</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body>
-            @if(session()->has('noParametersError'))
-                <p>{{session()->get('noParametersError')}}</p>
-            @endif
-            @if(!empty($books))
-                @foreach($books as $book)
-                    <div class="flex flex-row justify-between m-5 border-solid border-4 border-gray-200 items-center rounded-md">
-                        <div class="basis-1/2 inline-flex m-2">
-                            <div>
-                                <x-book-image src="{{$book['thumbnailUrl'] != null ? $book['thumbnailUrl'] : asset('img/book-image-not-found.png')}}" class="w-2/5"></x-book-image>
-                            </div>
-                            <div>
-                                <x-book-title>{{ $book['title'] }}</x-book-title>
-                                <x-book-author>{{ $book['authors'] != null ? $book['authors'][0] : 'Not Available' }}</x-book-author>
-                                <p>Pubblicazione: {{ $book['publishedDate'] }}</p>
-                            </div>
-                        </div>
-                        <div class="flex basis-1/2 justify-end mb-3">
-                            <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/onloan" id="add-book-{{ $book['id'] }}-on-loan" class="hidden">
-                                @csrf
-                            </form>
-                            <x-form-button class="m-2" form="add-book-{{ $book['id'] }}-on-loan">Aggiungi libro nei prestiti</x-form-button>
-                            <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/ontrade" id="add-book-{{ $book['id'] }}-on-trade" class="hidden">
-                                @csrf
-                            </form>
-                            <x-form-button class="m-2" form="add-book-{{ $book['id'] }}-on-trade">Aggiungi libro in scambio</x-form-button>
-                        </div>
+<x-layout>
+    <x-slot:navbar>
+        <x-navbar>
+            <x-navbar-links-list>
+            </x-navbar-links-list>
+            <div class="nav-button-container">
+                <a class="nav-btn" href="/users/user/books/create">Back to form</a>
+            </div>
+        </x-navbar>
+    </x-slot:navbar>
+    <x-slot:header>
+        <div class="page-header-container">
+            <div class="page-header">
+                <p>Those are the books found!</p>
+            </div>
+        </div>
+    </x-slot:header>
+    <main class="books-list-container margin-top-lg">
+    @if(!empty($books))
+        <ul class="books-list justify-space-around">
+            @foreach($books as $book)
+                <li class="book-list-element">
+                    <figure class="book-image-figure">
+                        <img class="book-image" src="{{$book['thumbnailUrl'] != null ? $book['thumbnailUrl'] : asset('img/book-image-not-found.png')}}" width="290" height="440" alt="Book image"/>
+                    </figure>
+                    <div class="book-info-container">
+                        <p>Title: {{ $book['title'] }}</p>
+                        <p>Author: {{ $book['authors'] != null ? $book['authors'][0] : 'Not Available' }}</p>
+                        <p>Publish date: {{ $book['publishedDate'] != null ? $book['publishedDate'] : 'Not Available' }}</p>
                     </div>
-                @endforeach
-                <a href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber + 1),request()->getRequestUri())}}">Next</a>
-                @if($currentPageNumber > 1)
-                    <a href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber - 1),request()->getRequestUri())}}">Previous</a>
-                @endif
-            @else
-                <p>La ricerca non ha prodotto risultati</p>
-                @if($currentPageNumber > 1)
-                    <a href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber - 1),request()->getRequestUri())}}">Previous</a>
-                @endif
-            @endif
-    </body>
-</html>
+                    <div class="book-actions-container">
+                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/onloan" id="add-book-{{ $book['id'] }}-on-loan" hidden>
+                            @csrf
+                        </form>
+                        <x-button type="submit" form="add-book-{{ $book['id'] }}-on-loan">Add to books on loan</x-button>
+                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/ontrade" id="add-book-{{ $book['id'] }}-on-trade" hidden>
+                            @csrf
+                        </form>
+                        <x-button type="submit" form="add-book-{{ $book['id'] }}-on-trade">Add to books on trade</x-button>
+                    </div>
+                </li>
+            @endforeach
+            <li class="pagination-buttons-container">
+                <div class="previous-btn">
+                    @if($currentPageNumber > 1)
+                        <x-button href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber - 1),request()->getRequestUri())}}">Previous</x-button>
+                    @endif
+                </div>
+                <div class="next-btn">
+                    <x-button href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber + 1),request()->getRequestUri())}}">Next</x-button>
+                </div>
+            </li>
+        </ul>
+    @else
+        <p>La ricerca non ha prodotto risultati</p>
+        @if($currentPageNumber > 1)
+        <div class="pagination-buttons">
+            <x-button href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber - 1),request()->getRequestUri())}}">Previous</x-button>
+        </div>
+        @endif
+    @endif
+    </main>
+</x-layout>
+
 
 

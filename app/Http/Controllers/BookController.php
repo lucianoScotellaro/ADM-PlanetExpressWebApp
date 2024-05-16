@@ -19,6 +19,10 @@ class BookController extends Controller
             return redirect('/users/user/books/create');
         }
 
+        if(session()->has('noParametersError')){
+            session()->forget('noParametersError');
+        }
+
         return view('books.search-results', [
             'user'=>User::find(1),
             'books'=>$this->fetchBooks(),

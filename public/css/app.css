@@ -65,7 +65,7 @@ main{
     background-position: bottom right;
 }
 
-.register, .login{
+.register, .login, .search{
     top: -13vh;
 }
 
@@ -79,7 +79,7 @@ main{
 
 .page-header{
     z-index: 99;
-    position: relative;
+    position: sticky;
     top: 0;
     left: 200px;
     height: 23vh;
@@ -91,6 +91,12 @@ main{
     box-shadow: var(--PLANET-LIGHT-RED) 2px 3px;
     border: 2px solid var(--PLANET-RED);
     border-radius: 30px;
+}
+
+.page-header-container{
+    position: relative;
+    top: 0;
+    left: 0;
 }
 
 .user-profile-header{
@@ -126,11 +132,14 @@ main{
 }
 
 .books-list-container{
+    top: -13vh;
+    margin-top: 60px;
     overflow: auto;
 }
 
 .signup-form,
-.login-form {
+.login-form,
+.search-form{
     align-items: center;
     background-color: var(--PLANET-GREEN);
     border-radius: 10px;
@@ -154,13 +163,55 @@ main{
     height: 100%;
 }
 
+.search-form{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 600px;
+    max-width: 800px;
+    margin: 50px 0 0 50px;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    justify-content: center;
+}
+
+.pagination-buttons-container{
+    list-style: none;
+    width: 100%;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
 /* ELEMENTS */
 
 /* GENERAL */
 
-button:hover,
+.button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: row nowrap;
+    text-decoration: none;
+    color: black;
+    width: 100%;
+    height: 2.5rem;
+}
+
 button:hover {
     transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+
+.previous-btn, .next-btn{
+    max-width: 200px;
+    width: 50%;
+    height: 100%;
+    margin: 40px;
 }
 
 /* HEADER */
@@ -230,6 +281,7 @@ button:hover {
     color: black;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 .nav-btn:hover{
@@ -369,6 +421,7 @@ button:hover {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
+    justify-content: center;
     gap: 10px;
 }
 
@@ -378,7 +431,7 @@ button:hover {
     height: 100%;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     background-color: var(--PLANET-GREEN);
     border: 3px solid var(--PLANET-RED);
@@ -395,36 +448,48 @@ button:hover {
 .book-image-figure{
     width: 100%;
     height: 100%;
-    max-width: 300px;
-    max-height: 200px;
-    margin: 10px;
-    padding: 10px;
+    max-width: 240px;
+    max-height: 180px;
+    margin: 10px 0 10px 10px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .book-image{
-    width: 50%;
+    width: 45%;
     height: auto;
+    border: 2px solid var(--PLANET-RED);
+    border-radius: 5px;
+    box-shadow: var(--PLANET-LIGHT-RED) 3px 3px;
 }
 
 .book-info-container{
+    width: 100%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
     align-items: start;
+    gap: 5px;
 }
 
 .book-actions-container{
-    width: 10%;
+    width: 100%;
     min-width: 100px;
+    max-width: 300px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 0 30px;
 }
 
 /* FORM */
 
 .signup-form .form-header,
-.login-form .form-header {
+.login-form .form-header,
+.search-form .form-header{
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-around;
@@ -433,7 +498,8 @@ button:hover {
 }
 
 .signup-form .form-header p,
-.login-form .form-header p {
+.login-form .form-header p,
+.search-form .form-header p{
     display: flex;
     padding: 5px;
     font-size: 30px;
@@ -460,12 +526,39 @@ button:hover {
     cursor: pointer;
 }
 
+.form-fields{
+    width: 100%;
+    height: 50%;
+    display: grid;
+    grid-template-rows: 47.5% 47.5%;
+    row-gap: 0;
+    background-color: var(--PLANET-GREEN);
+    border: 3px solid var(--PLANET-RED);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 40px 0;
+}
+
+.form-fields-row{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .form-field {
     width: 80%;
     border: solid var(--PLANET-RED) 2px;
     background-color: var(--PLANET-YELLOW);
     border-radius: 5px;
 }
+
+.search-form .form-field{
+    width: 100%;
+    height: 100%;
+    max-height: 4rem;
+    margin: 10px;
+}
+
 .form-label {
     display: block;
     margin-bottom: 2px;
@@ -483,6 +576,14 @@ button:hover {
     outline: none;
     font-size: 16px;
     padding: 0 8px;
+}
+
+.form-select{
+    width: 100%;
+    background-color: transparent;
+    height: 100%;
+    font-family: "Share Tech Mono", sans-serif;
+    font-size: 0.8rem;
 }
 
 .form-btn {
@@ -529,6 +630,60 @@ button:hover {
     padding: 1px 20%;
     text-align: center;
 }
+
+/* MODIFIERS */
+
+/* GENERAL */
+
+.text-error{
+    color: red;
+    text-decoration: underline;
+}
+
+.margin-top-lg{
+    margin-top: 120px;
+}
+
+.margin-top-sm{
+    margin-top: 8px;
+}
+
+.no-top{
+    top: 0;
+}
+
+.flex-col-no-wrap{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+.justify-space-around{
+    justify-content: space-around;
+}
+
+/* BUTTON */
+
+.button-primary{
+    background-color: var(--PLANET-LIGHT-RED);
+    border: 3px solid var(--PLANET-RED);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.button-primary:hover{
+    box-shadow: var(--PLANET-LIGHT-RED) 3px 3px;
+    transform: scale(1.1);
+    transition: all 0.1s ease;
+}
+
+/* FORM */
+
+.with-select{
+    grid-template-rows: 40% 40% 15%;
+}
+
+/* RESPONSIVE */
 
 @media screen and (min-width: 1529px) {
     .signup-form {
