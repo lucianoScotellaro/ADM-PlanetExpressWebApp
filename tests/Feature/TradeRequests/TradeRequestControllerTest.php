@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
 
@@ -27,6 +28,15 @@ it('cannot ask for a trade request to himself', function(){
         ->assertStatus(403);
 });
 
+it('cannot ask for a trade request where requested book is not in receiver books list', function(){
+    $receiver = userWithBooks();
+    $sender = User::factory()->create();
+    $book = Book::factory()->create();
+
+    login($sender)->get('trades/ask/'.$receiver->id.'/'.$book->id)
+        ->assertStatus(403);
+});
+
 it('can create pending trade request proposing his book', function(){
     $receiver = userWithBooks();
     $sender = userWithBooks();
@@ -39,6 +49,23 @@ it('can create pending trade request proposing his book', function(){
         ->assertRedirect('/');
 
     expect($receiver->pendingReceivedTradeRequests()->count())->toBe(1);
+});
+
+it('cannot create the same pending trade request for the same user', function(){
+    $receiver = userWithBooks();
+    $sender = userWithBooks();
+    session(['receiver'=>$receiver->id, 'requestedBook'=>$receiver->books()->first()->id]);
+    TradeRequest::create([
+        'sender_id'=>$sender->id,
+        'receiver_id'=>$receiver->id,
+        'requested_book_id'=>$receiver->books()->first()->id,
+        'proposed_book_id'=>$sender->books()->first()->id
+    ]);
+
+    login($sender)->post('/trades/propose/'.$sender->books()->first()->id)
+        ->assertStatus(302)
+        ->assertSessionHas('alreadyExistsError')
+        ->assertRedirect('/');
 });
 
 it('cannot create pending trade request proposing not his book', function(){

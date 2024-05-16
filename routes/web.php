@@ -6,6 +6,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\LoanRequestController;
 use App\Http\Controllers\TradeRequestController;
 use App\Http\Controllers\UserController;
+use App\Models\Book;
 use App\Models\LoanRequest;
 use App\Models\TradeRequest;
 use Illuminate\Support\Facades\Route;
@@ -33,10 +34,12 @@ Route::get('/users/{user}/books', [UserController::class, 'showBooks']);
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
 
 Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook'])
-    ->middleware('auth');
+    ->middleware('auth')
+    ->can('addBook', [Book::class, 'user', 'state']);
 
 Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook'])
-    ->middleware('auth')    ;
+    ->middleware('auth')
+    ->can('removeBook', [Book::class, 'user', 'book', 'state']);
 
 //Books
 Route::get('/books/search', [BookController::class, 'search']);
@@ -47,7 +50,7 @@ Route::get('/trades/requests/received', [TradeRequestController::class, 'index']
 
 Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
     ->middleware('auth')
-    ->can('requestBook', [TradeRequest::class, 'receiver']);
+    ->can('requestBook', [TradeRequest::class, 'receiver', 'requestedBook']);
 
 Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store'])
     ->middleware('auth')
@@ -62,6 +65,10 @@ Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [T
     ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
 
 //Loans
+Route::post('/loans/ask/{receiver}/{requestedBook}', [LoanRequestController::class, 'store'])
+    ->middleware('auth')
+    ->can('requestBook', [LoanRequest::class, 'receiver', 'requestedBook']);
+
 Route::get('/loans/requests/received', [LoanRequestController::class, 'index'])
     ->middleware('auth');
 

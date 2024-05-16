@@ -5,13 +5,12 @@ namespace App\Policies;
 use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 class TradeRequestPolicy
 {
-    public function requestBook(User $user, User $receiver):bool
+    public function requestBook(User $user, User $receiver, Book $requestedBook):bool
     {
-        return !$user->is($receiver);
+        return !$user->is($receiver) && $receiver->books->contains($requestedBook);
     }
 
     public function proposeBook(User $user, Book $proposedBook):bool
