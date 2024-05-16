@@ -14,10 +14,11 @@ class LoanRequestController extends Controller
     }
 
     public function store(User $receiver, Book $requestedBook){
-        $inLoans = $receiver->booksOnLoan()->contains($requestedBook);
+        $redirectURL = '/users/'.$receiver->id.'/books/onloan';
 
+        $inLoans = $receiver->booksOnLoan()->contains($requestedBook);
         if(!$inLoans){
-            return redirect('/users/'.$receiver->id.'/books/onloan')->with('notInListError', 'Selected book is not available for loan.');
+            return redirect($redirectURL)->with('notInListError', 'Selected book is not available for loan.');
         }
 
         $validated = request()->validate([
@@ -31,13 +32,15 @@ class LoanRequestController extends Controller
                 'requested_book_id'=>$requestedBook->id,
                 'expiration'=>$validated['expiration']
             ]);
-            return redirect('/users/'.$receiver->id.'/books/onloan')->with('success','Request sent successfully!');
+            return redirect($redirectURL)->with('success','Request sent successfully!');
         }catch (\Exception $e){
-            return redirect('/users/'.$receiver->id.'/books/onloan')->with('alreadyExistsError','You have already sent this user this loan request');
+            return redirect($redirectURL)->with('alreadyExistsError','You have already sent this user this loan request');
         }
     }
 
     public function update(User $sender, Book $requestedBook){
+        $redirectURL = '/loans/requests/received';
+
         $receiver = auth()->user();
         $request = LoanRequest::find([$receiver->id, $sender->id, $requestedBook->id]);
 
@@ -45,12 +48,12 @@ class LoanRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            return redirect('/loans/requests/received')->with('success','Request accepted successfully!');
+            return redirect($redirectURL)->with('success','Request accepted successfully!');
         }elseif('loans/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            return redirect('/loans/requests/received')->with('success','Request refused successfully!');
+            return redirect($redirectURL)->with('success','Request refused successfully!');
         }
     }
 }
