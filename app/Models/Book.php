@@ -47,10 +47,8 @@ class Book extends Model
 
     public function proposers(): BelongsToMany
     {
-        return $this->users()
-            ->where('onLoan','=',1, 'or')
-            ->where('onTrade','=',1)
-            ->groupBy('user_id');
+        return $this->users();
+            //->where('onWishlist', '=', 0);
     }
 
     private static function search(array $parameters)
