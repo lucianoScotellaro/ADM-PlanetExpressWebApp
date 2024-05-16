@@ -5,16 +5,9 @@ use App\Models\User;
 
 it('renders user\'s pending received trade requests', function () {
     $user = User::factory()->create();
-    login($user)->get('trades/requests/received/'.$user->id)
+    login($user)->get('trades/requests/received')
         ->assertStatus(200)
         ->assertViewIs('trades.received.index');
-});
-
-it('doesn\'t render another user\'s pending received trade requests page', function () {
-    $user = User::factory()->create();
-    $anotherUser = User::factory()->create();
-    login($user)->get('trades/requests/received/'.$anotherUser->id)
-        ->assertStatus(403);
 });
 
 it('can ask for a trade request',function (){
@@ -71,7 +64,7 @@ it('can accept or refuse pending trade request',function(string $action){
     login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
         ->assertStatus(302)
         ->assertSessionHas('success')
-        ->assertRedirect('/trades/requests/received/'.$receiver->id);
+        ->assertRedirect('/trades/requests/received');
 
     $request = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->id, $receiver->books()->first()->id]);
 

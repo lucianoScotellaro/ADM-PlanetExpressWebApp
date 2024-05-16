@@ -38,7 +38,7 @@ class UserController extends Controller
 
         $books = Book::searchOn($parameters, $searchOn);
         return view('users.search-results', [
-            'user' => User::find(1),
+            'user' => auth()->user(),
             'books' => $books
         ]);
     }
@@ -46,7 +46,7 @@ class UserController extends Controller
     public function showProposers(Book $book){
         return view('users.proposers-index',[
             'book' => $book,
-            'proposers' =>  $book->proposers()->get()->where('id', '!=',1)
+            'proposers' =>  $book->proposers()->get()->where('id', '!=',auth()->id())
         ]);
     }
 

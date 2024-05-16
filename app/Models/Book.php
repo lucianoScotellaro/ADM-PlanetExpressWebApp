@@ -26,11 +26,11 @@ class Book extends Model
                 if ($searchOn == 'proposedBook') {
                     $query->select('book_id')
                         ->from('book_user')
-                        ->where('user_id', '!=', 1);
+                        ->where('user_id', '!=', auth()->id());
                 } elseif ($searchOn == 'requestedBook') {
                     $query->select('book_id')
                         ->from('book_user')
-                        ->where('user_id', '!=', 1)
+                        ->where('user_id', '!=', auth()->id())
                         ->where('onWishlist', '=', 1);
                 }
             })

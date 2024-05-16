@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TradeRequestPolicy
 {
-    public function seePendingRequests(User $user, User $receiver):bool
-    {
-        return $user->is($receiver);
-    }
-
     public function requestBook(User $user, User $receiver):bool
     {
         return !$user->is($receiver);

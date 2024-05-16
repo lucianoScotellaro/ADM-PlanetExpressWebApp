@@ -63,8 +63,8 @@
                             @method('DELETE')
                         </form>
                         <x-form-button form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
-                        <x-button href="/loan/{{$user->id}}/{{$book->ISBN}}">Request on loan</x-button>
-                        <x-button href="/trades/ask/{{$user->id}}/{{$book->ISBN}}">Suggest trade</x-button>
+                        <x-button href="/loan/{{$user->id}}/{{$book->id}}">Request on loan</x-button>
+                        <x-button href="/trades/ask/{{$user->id}}/{{$book->id}}">Suggest trade</x-button>
                     </div>
                 </li>
             @endforeach
