@@ -45,14 +45,14 @@ class LoanRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            session(['success'=>'Richiesta accettata con successo.']);
+            return redirect('/loans/requests/received')->with('success','Request accepted successfully!');
         }elseif('loans/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            session(['success'=>'Richiesta rifiutata con successo.']);
+            return redirect('/loans/requests/received')->with('success','Request refused successfully!');
+        }else{
+            return redirect('/loans/requests/received');
         }
-
-        return redirect('/loans/requests/received');
     }
 }

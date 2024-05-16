@@ -52,14 +52,12 @@ class TradeRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            session(['success'=>'Request accepted successfully!']);
+            return redirect('/trades/requests/received')->with('success','Request accepted successfully!');
         }elseif('trades/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            session(['success'=>'Request refused successfully!']);
+            return redirect('/trades/requests/received')->with('success','Request refused successfully!');
         }
-
-        return redirect('/trades/requests/received');
     }
 }
