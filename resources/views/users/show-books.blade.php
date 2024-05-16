@@ -60,24 +60,27 @@
                             @csrf
                             @method('DELETE')
                         </form>
-                        <x-button type="submit" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-button>
+                        <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-form-button>
                         <form action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" method="POST" id="delete-book-{{ $book->id }}-on-trade" hidden>
                             @csrf
                             @method('DELETE')
                         </form>
-                        <x-button type="submit" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-button>
+                        <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
                         @endcan
                         @cannot('editBooks', [\App\Models\Book::class, $user])
-                        <form action="/loans/ask/{{$user->id}}/{{$book->id}}" method="POST">
-                            @csrf
-                            <label for="expiration">Expiration (days)</label>
-                            <input type="number" name="expiration" id="expiration" min="14" max="60">
-                            <x-form-error name="expiration"></x-form-error>
-                            <x-form-button>Request on loan</x-form-button>
-                        </form>
+                        <div class="width-max inline-form-container">
+                            <x-form-button class="width-max" form="{{$book->id}}-loan-expiration">Request on loan</x-form-button>
+                            <form id="{{$book->id}}-loan-expiration" action="/loans/ask/{{$user->id}}/{{$book->id}}" method="POST" class="inline-form">
+                                @csrf
+                                <x-form-field>
+                                    <x-form-label for="expiration">Days</x-form-label>
+                                    <x-form-input type="number" name="expiration" id="expiration" min="14" max="60" required/>
+                                </x-form-field>
+                                <x-form-error name="expiration"></x-form-error>
+                            </form>
+                        </div>
                         <x-button href="/trades/ask/{{$user->id}}/{{$book->id}}">Request on trade</x-button>
                             @endcannot
-                      <x-form-button form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
                     </div>
                 </li>
             @endforeach
