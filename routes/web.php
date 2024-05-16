@@ -14,17 +14,17 @@ Route::get('/', function () {
     return view('home');
 });
 
-//Users
-Route::get('/users/search/form', [UserController::class, 'searchForm']);
-Route::get('/users/search', [UserController::class, 'search']);
-Route::get('users/search/proposers/{book}', [UserController::class, 'showProposers']);
-
 //Auth
 Route::get('/register', [RegisteredUserController::class, 'create']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::get('/login', [SessionController::class, 'create']);
 Route::post('/login', [SessionController::class, 'store']);
 Route::post('/logout', [SessionController::class, 'destroy']);
+
+//Users
+Route::get('/users/search/form', [UserController::class, 'searchForm']);
+Route::get('/users/search', [UserController::class, 'search']);
+Route::get('users/search/proposers/{book}', [UserController::class, 'showProposers']);
 
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
