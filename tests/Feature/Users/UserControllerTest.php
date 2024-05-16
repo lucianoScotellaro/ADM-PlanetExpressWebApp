@@ -4,6 +4,15 @@
 use App\Models\Book;
 use App\Models\User;
 
+it("should render user profile page", function (User $user){
+
+    login($user)->get('/users/1')
+        ->assertStatus(200)
+        ->assertViewIs('users.show');
+})->with([
+    fn() => User::factory()->create()
+]);
+
 it('should render another user profile page', function(){
     $user = User::factory()->create();
     $anotherUser = User::factory()->create();
