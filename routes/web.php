@@ -35,11 +35,11 @@ Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
 
 Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook'])
     ->middleware('auth')
-    ->can('addBook', [Book::class, 'user', 'state']);
+    ->can('editBooks', [Book::class, 'user', 'state']);
 
 Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook'])
     ->middleware('auth')
-    ->can('removeBook', [Book::class, 'user', 'book', 'state']);
+    ->can('editBooks', [Book::class, 'user', 'book', 'state']);
 
 //Books
 Route::get('/books/search', [BookController::class, 'search']);
