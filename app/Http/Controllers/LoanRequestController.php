@@ -14,6 +14,12 @@ class LoanRequestController extends Controller
     }
 
     public function store(User $receiver, Book $requestedBook){
+        $inLoans = $receiver->booksOnLoan()->contains($requestedBook);
+
+        if(!$inLoans){
+            return redirect('/users/'.$receiver->id.'/books/onloan')->with('notInListError', 'Selected book is not available for loan.');
+        }
+
         $validated = request()->validate([
             'expiration'=>['required','int','min:14', 'max:60']
         ]);
@@ -25,12 +31,10 @@ class LoanRequestController extends Controller
                 'requested_book_id'=>$requestedBook->id,
                 'expiration'=>$validated['expiration']
             ]);
-            session(['success'=>'Request sent successfully!']);
+            return redirect('/users/'.$receiver->id.'/books/onloan')->with('success','Request sent successfully!');
         }catch (\Exception $e){
-            session(['alreadyExistsError'=>'You have already sent this user this loan request']);
+            return redirect('/users/'.$receiver->id.'/books/onloan')->with('alreadyExistsError','You have already sent this user this loan request');
         }
-
-        return redirect('/');
     }
 
     public function update(User $sender, Book $requestedBook){
