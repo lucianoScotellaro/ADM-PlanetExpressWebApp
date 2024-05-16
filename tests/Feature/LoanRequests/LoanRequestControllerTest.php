@@ -6,16 +6,10 @@ use Illuminate\Support\Facades\Log;
 
 it('renders user\'s pending received loan requests page', function (){
     $user = User::factory()->create();
-    login($user)->get('loans/requests/received/'.$user->id)
+    login($user)->get('loans/requests/received')
         ->assertStatus(200)
-        ->assertViewIs('loans.received.index');
-});
-
-it('doesn\'t render another user\'s pending received loan requests page', function (){
-    $user = User::factory()->create();
-    $anotherUser = User::factory()->create();
-    login($user)->get('loans/requests/received/'.$anotherUser->id)
-        ->assertStatus(403);
+        ->assertViewIs('loans.received.index')
+        ->assertViewHas('user',$user);
 });
 
 it('can accept or refuse a pending loan request', function(string $action){
@@ -32,7 +26,7 @@ it('can accept or refuse a pending loan request', function(string $action){
     login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id)
         ->assertStatus(302)
         ->assertSessionHas('success')
-        ->assertRedirect('/loans/requests/received/'.$receiver->id);
+        ->assertRedirect('/loans/requests/received');
 
     $request = LoanRequest::find([$receiver->id, $sender->id, $receiver->books()->first()->id]);
 

@@ -64,7 +64,7 @@ it('can accept or refuse pending trade request',function(string $action){
     login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
         ->assertStatus(302)
         ->assertSessionHas('success')
-        ->assertRedirect('/trades/requests/received/'.$receiver->id);
+        ->assertRedirect('/trades/requests/received');
 
     $request = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->id, $receiver->books()->first()->id]);
 
