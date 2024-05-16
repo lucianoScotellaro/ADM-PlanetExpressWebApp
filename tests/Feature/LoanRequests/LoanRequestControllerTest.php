@@ -4,14 +4,14 @@ use App\Models\Book;
 use App\Models\LoanRequest;
 use App\Models\User;
 
-it('can send a loan request', function(){
+it('should send a loan request', function(){
     $user = User::factory()->create();
-    $anotherUser = userWithBooks();
+    $anotherUser = userWithLoanableBooks();
     expect($anotherUser->pendingReceivedLoanRequests()->count())->toBe(0);
 
     login($user)->post('/loans/ask/'.$anotherUser->id.'/'.$anotherUser->books()->first()->id, ['expiration'=>20])
         ->assertStatus(302)
-        ->assertRedirect('/')
+        ->assertRedirect('/users/'.$anotherUser->id.'/books/onloan')
         ->assertSessionHas('success');
 
     expect($anotherUser->pendingReceivedLoanRequests()->count())->toBe(1)
@@ -20,9 +20,9 @@ it('can send a loan request', function(){
         ->and($anotherUser->pendingReceivedLoanRequests()->first()->expiration)->toBe(20);
 });
 
-it('cannot send the same loan request to the same user multiple times', function(){
+it('should not send the same loan request to the same user multiple times', function(){
     $user = User::factory()->create();
-    $anotherUser = userWithBooks();
+    $anotherUser = userWithLoanableBooks();
     LoanRequest::create([
         'sender_id'=>$user->id,
         'receiver_id'=>$anotherUser->id,
@@ -35,9 +35,9 @@ it('cannot send the same loan request to the same user multiple times', function
         ->assertSessionHas('alreadyExistsError');
 });
 
-it('cannot send a loan request with expiration that is less than 14 or greater than 60', function(int $expiration){
+it('should not send a loan request with expiration that is less than 14 or greater than 60', function(int $expiration){
     $user = User::factory()->create();
-    $anotherUser = userWithBooks();
+    $anotherUser = userWithLoanableBooks();
 
     login($user)->post('/loans/ask/'.$anotherUser->id.'/'.$anotherUser->books()->first()->id, ['expiration'=>$expiration])
         ->assertStatus(302)
@@ -47,14 +47,14 @@ it('cannot send a loan request with expiration that is less than 14 or greater t
     100
 ]);
 
-it('cannot send a loan request to himself', function(){
+it('should not send a loan request to himself', function(){
     $user = userWithBooks();
 
     login($user)->post('loans/ask/'.$user->id.'/'.$user->books()->first()->id, ['expiration'=>20])
         ->assertStatus(403);
 });
 
-it('cannot send a loan request with a requested book that is not in receiver books list', function(){
+it('should not send a loan request with a requested book that is not in receiver books list', function(){
     $user = User::factory()->create();
     $anotherUser = userWithBooks();
     $book = Book::factory()->create();
@@ -63,7 +63,16 @@ it('cannot send a loan request with a requested book that is not in receiver boo
         ->assertStatus(403);
 });
 
-it('renders user\'s pending received loan requests page', function (){
+it('should not send a loan request for a book is not in receiver\'s loans list', function(){
+    $receiver = userWithTradeableBooks();
+
+    login()->post('/loans/ask/'.$receiver->id.'/'.$receiver->books()->first()->id, ['expiration'=>20])
+        ->assertStatus(302)
+        ->assertRedirect('/users/'.$receiver->id.'/books/onloan')
+        ->assertSessionHas('notInListError');
+});
+
+it('should render user\'s pending received loan requests page', function (){
     $user = User::factory()->create();
     login($user)->get('loans/requests/received')
         ->assertStatus(200)
@@ -71,7 +80,7 @@ it('renders user\'s pending received loan requests page', function (){
         ->assertViewHas('user',$user);
 });
 
-it('can accept or refuse a pending loan request', function(string $action){
+it('should accept or refuse a pending loan request', function(string $action){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
@@ -99,7 +108,7 @@ it('can accept or refuse a pending loan request', function(string $action){
     'refuse'
 ]);
 
-it('cannot accept or refuse a resolved loan request', function(string $action, bool $response){
+it('should not accept or refuse a resolved loan request', function(string $action, bool $response){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
@@ -120,7 +129,7 @@ it('cannot accept or refuse a resolved loan request', function(string $action, b
     false
 ]);
 
-it('cannot accept or refuse a non-existent loan request', function(string $action){
+it('should not accept or refuse a non-existent loan request', function(string $action){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 

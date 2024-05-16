@@ -4,15 +4,15 @@ use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
 
-it('renders user\'s pending received trade requests', function () {
+it('should render user\'s pending received trade requests', function () {
     $user = User::factory()->create();
     login($user)->get('trades/requests/received')
         ->assertStatus(200)
         ->assertViewIs('trades.received.index');
 });
 
-it('can ask for a trade request',function (){
-    $receiver = userWithBooks();
+it('should ask for a trade request',function (){
+    $receiver = userWithTradeableBooks();
     $sender = User::factory()->create();
 
     login($sender)->get('trades/ask/'.$receiver->id.'/'.$receiver->books()->first()->id)
@@ -21,14 +21,14 @@ it('can ask for a trade request',function (){
         ->assertViewIs('trades.show-propose');
 });
 
-it('cannot ask for a trade request to himself', function(){
+it('should not ask for a trade request to himself', function(){
     $user = userWithBooks();
 
     login($user)->get('trades/ask/'.$user->id.'/'.$user->books()->first()->id)
         ->assertStatus(403);
 });
 
-it('cannot ask for a trade request where requested book is not in receiver books list', function(){
+it('should not ask for a trade request where requested book is not in receiver books list', function(){
     $receiver = userWithBooks();
     $sender = User::factory()->create();
     $book = Book::factory()->create();
@@ -37,8 +37,8 @@ it('cannot ask for a trade request where requested book is not in receiver books
         ->assertStatus(403);
 });
 
-it('can create pending trade request proposing his book', function(){
-    $receiver = userWithBooks();
+it('should create pending trade request proposing his book', function(){
+    $receiver = userWithTradeableBooks();
     $sender = userWithBooks();
     session(['receiver'=>$receiver->id, 'requestedBook'=>$receiver->books()->first()->id]);
 
@@ -46,13 +46,14 @@ it('can create pending trade request proposing his book', function(){
 
     login($sender)->post('/trades/propose/'.$sender->books()->first()->id)
         ->assertStatus(302)
-        ->assertRedirect('/');
+        ->assertSessionHas('success')
+        ->assertRedirect('/users/'.$receiver->id.'/books/ontrade');
 
     expect($receiver->pendingReceivedTradeRequests()->count())->toBe(1);
 });
 
-it('cannot create the same pending trade request for the same user', function(){
-    $receiver = userWithBooks();
+it('should not create the same pending trade request for the same user', function(){
+    $receiver = userWithTradeableBooks();
     $sender = userWithBooks();
     session(['receiver'=>$receiver->id, 'requestedBook'=>$receiver->books()->first()->id]);
     TradeRequest::create([
@@ -65,10 +66,10 @@ it('cannot create the same pending trade request for the same user', function(){
     login($sender)->post('/trades/propose/'.$sender->books()->first()->id)
         ->assertStatus(302)
         ->assertSessionHas('alreadyExistsError')
-        ->assertRedirect('/');
+        ->assertRedirect('/users/'.$receiver->id.'/books/ontrade');
 });
 
-it('cannot create pending trade request proposing not his book', function(){
+it('should not create pending trade request proposing not his book', function(){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
@@ -76,7 +77,16 @@ it('cannot create pending trade request proposing not his book', function(){
         ->assertStatus(403);
 });
 
-it('can accept or refuse pending trade request',function(string $action){
+it('should not create a trade request if requested book is not in receiver trades list', function(){
+    $receiver = userWithLoanableBooks();
+
+    login()->get('/trades/ask/'.$receiver->id.'/'.$receiver->books()->first()->id)
+        ->assertStatus(302)
+        ->assertRedirect('/users/'.$receiver->id.'/books/ontrade')
+        ->assertSessionHas('notInListError');
+});
+
+it('should accept or refuse pending trade request',function(string $action){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 

@@ -51,8 +51,6 @@ class LoanRequestController extends Controller
                'response'=>false
             ]);
             return redirect('/loans/requests/received')->with('success','Request refused successfully!');
-        }else{
-            return redirect('/loans/requests/received');
         }
     }
 }
