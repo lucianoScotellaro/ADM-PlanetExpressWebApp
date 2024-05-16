@@ -32,11 +32,11 @@
                         <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/onloan" id="add-book-{{ $book['id'] }}-on-loan" hidden>
                             @csrf
                         </form>
-                        <x-button type="submit" form="add-book-{{ $book['id'] }}-on-loan">Add to books on loan</x-button>
+                        <x-form-button class="width-max" form="add-book-{{ $book['id'] }}-on-loan">Add to books on loan</x-form-button>
                         <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/ontrade" id="add-book-{{ $book['id'] }}-on-trade" hidden>
                             @csrf
                         </form>
-                        <x-button type="submit" form="add-book-{{ $book['id'] }}-on-trade">Add to books on trade</x-button>
+                        <x-form-button class="width-max" form="add-book-{{ $book['id'] }}-on-trade">Add to books on trade</x-form-button>
                     </div>
                 </li>
             @endforeach

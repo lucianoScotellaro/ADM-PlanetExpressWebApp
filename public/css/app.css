@@ -177,6 +177,13 @@ main{
     justify-content: center;
 }
 
+.inline-form-container{
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .pagination-buttons-container{
     list-style: none;
     width: 100%;
@@ -476,7 +483,7 @@ button:hover {
 .book-actions-container{
     width: 100%;
     min-width: 100px;
-    max-width: 300px;
+    max-width: 400px;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
@@ -486,6 +493,15 @@ button:hover {
 }
 
 /* FORM */
+
+.inline-form{
+    width: 100%;
+    max-width: 80px;
+    height: 50%;
+    max-height: 2rem;
+    margin-left: 8px;
+    margin-bottom: 12px;
+}
 
 .signup-form .form-header,
 .login-form .form-header,
@@ -552,6 +568,11 @@ button:hover {
     border-radius: 5px;
 }
 
+.inline-form .form-field{
+    height: 1%;
+    width: 100%;
+}
+
 .search-form .form-field{
     width: 100%;
     height: 100%;
@@ -566,6 +587,11 @@ button:hover {
     padding: 6px;
 }
 
+.inline-form .form-label{
+    padding: 0;
+    text-align: center;
+}
+
 .form-input {
     font-family: "Share Tech Mono", sans-serif;
     width: 100%;
@@ -576,6 +602,11 @@ button:hover {
     outline: none;
     font-size: 16px;
     padding: 0 8px;
+}
+
+.inline-form .form-input{
+    height: 25px;
+    text-align: center;
 }
 
 .form-select{
@@ -646,6 +677,10 @@ button:hover {
 
 .margin-top-sm{
     margin-top: 8px;
+}
+
+.width-max{
+    width: 100%;
 }
 
 .no-top{

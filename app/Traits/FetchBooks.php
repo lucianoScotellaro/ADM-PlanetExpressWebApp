@@ -95,7 +95,7 @@ trait FetchBooks
             'title' => $bookInfo->title,
             'author' => property_exists($bookInfo,'authors') ? $bookInfo->authors[0] : $fallbackString,
             'description' => property_exists($bookInfo,'description') ? $bookInfo->description : $fallbackString,
-            'category' => property_exists($bookInfo,'categories') ? $bookInfo->categories[0] : null,
+            'category' => property_exists($bookInfo,'categories') ? $bookInfo->categories[0] : $fallbackString,
             'publishedDate' => property_exists($bookInfo,'publishedDate') ? $bookInfo->publishedDate : $fallbackString,
             'thumbnailUrl' => property_exists($bookInfo,'imageLinks') && property_exists($bookInfo->imageLinks,'thumbnail') ? $bookInfo->imageLinks->thumbnail : null,
             'pageCount' => property_exists($bookInfo,'pageCount') ? $bookInfo->pageCount : $fallbackString
