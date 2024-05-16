@@ -23,12 +23,17 @@ class TradeRequestController extends Controller
     public function store(Book $proposedBook){
         $user = auth()->user();
 
-        TradeRequest::create([
-            'receiver_id'=>session('receiver'),
-            'sender_id'=>$user->id,
-            'requested_book_id'=>session('requestedBook'),
-            'proposed_book_id'=>$proposedBook->id
-        ]);
+        try {
+            TradeRequest::create([
+                'receiver_id'=>session('receiver'),
+                'sender_id'=>$user->id,
+                'requested_book_id'=>session('requestedBook'),
+                'proposed_book_id'=>$proposedBook->id
+            ]);
+            session(['success'=>'Request sent successfully!']);
+        }catch (\Exception $e){
+            session(['alreadyExistsError'=>'You have already sent this user this trade request.']);
+        }
         session()->forget(['receiver','requestedBook']);
 
         return redirect('/');
@@ -42,12 +47,12 @@ class TradeRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            session(['success'=>'Richiesta accettata con successo']);
+            session(['success'=>'Request accepted successfully!']);
         }elseif('trades/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            session(['success'=>'Richiesta rifiutata con successo']);
+            session(['success'=>'Request refused successfully!']);
         }
 
         return redirect('/trades/requests/received');

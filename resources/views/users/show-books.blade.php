@@ -63,7 +63,13 @@
                             @method('DELETE')
                         </form>
                         <x-form-button form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
-                        <x-button href="/loan/{{$user->id}}/{{$book->id}}">Request on loan</x-button>
+                        <form action="/loans/ask/{{$user->id}}/{{$book->id}}" method="POST">
+                            @csrf
+                            <label for="expiration">Expiration (days)</label>
+                            <input type="number" name="expiration" id="expiration" min="14" max="60">
+                            <x-form-error name="expiration"></x-form-error>
+                            <x-form-button>Request on loan</x-form-button>
+                        </form>
                         <x-button href="/trades/ask/{{$user->id}}/{{$book->id}}">Suggest trade</x-button>
                     </div>
                 </li>
