@@ -9,7 +9,7 @@ it('returns loan request sender or receiver', function(string $role){
     $request = LoanRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN
+        'requested_book_id'=>$receiver->books()->first()->id
     ]);
 
     if($role == 'sender'){
@@ -29,8 +29,8 @@ it('returns loan request requested book', function(){
     $request = LoanRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN
+        'requested_book_id'=>$receiver->books()->first()->id
     ]);
 
-    expect($request->requestedBook->ISBN)->toBe($receiver->books()->first()->ISBN);
+    expect($request->requestedBook->id)->toBe($receiver->books()->first()->id);
 });

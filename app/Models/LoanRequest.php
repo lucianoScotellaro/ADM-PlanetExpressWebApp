@@ -13,7 +13,7 @@ class LoanRequest extends Model
     use HasCompositeKey;
 
     protected $guarded = [];
-    protected $primaryKey = ['receiver_id', 'sender_id', 'requested_book_ISBN'];
+    protected $primaryKey = ['receiver_id', 'sender_id', 'requested_book_id'];
 
     public function sender(): BelongsTo
     {
@@ -27,6 +27,6 @@ class LoanRequest extends Model
 
     public function requestedBook(): BelongsTo
     {
-        return $this->belongsTo(Book::class, foreignKey: 'requested_book_ISBN');
+        return $this->belongsTo(Book::class, foreignKey: 'requested_book_id');
     }
 }

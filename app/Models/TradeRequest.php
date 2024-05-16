@@ -13,7 +13,7 @@ class TradeRequest extends Model
 
     protected $table = 'trade_requests';
     protected $guarded = [];
-    protected $primaryKey = ['sender_id', 'receiver_id', 'proposed_book_ISBN', 'requested_book_ISBN'];
+    protected $primaryKey = ['sender_id', 'receiver_id', 'proposed_book_id', 'requested_book_id'];
 
     public function sender(){
         return $this->belongsTo(User::class, foreignKey: 'sender_id');
@@ -24,10 +24,10 @@ class TradeRequest extends Model
     }
 
     public function requestedBook(){
-        return $this->belongsTo(Book::class, foreignKey: 'requested_book_ISBN');
+        return $this->belongsTo(Book::class, foreignKey: 'requested_book_id');
     }
 
     public function proposedBook(){
-        return $this->belongsTo(Book::class, foreignKey: 'proposed_book_ISBN');
+        return $this->belongsTo(Book::class, foreignKey: 'proposed_book_id');
     }
 }

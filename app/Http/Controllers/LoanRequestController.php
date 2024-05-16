@@ -15,7 +15,7 @@ class LoanRequestController extends Controller
 
     public function update(User $sender, Book $requestedBook){
         $receiver = User::find(1);
-        $request = LoanRequest::find([$receiver->id, $sender->id, $requestedBook->ISBN]);
+        $request = LoanRequest::find([$receiver->id, $sender->id, $requestedBook->id]);
 
         if(request()->is('loans/requests/accept/*')){
             $request->update([

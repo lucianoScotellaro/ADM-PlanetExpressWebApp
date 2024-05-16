@@ -14,6 +14,11 @@ Route::get('/', function () {
     return view('home');
 });
 
+//Users
+Route::get('/users/search/form', [UserController::class, 'searchForm']);
+Route::get('/users/search', [UserController::class, 'search']);
+Route::get('users/search/proposers/{book}', [UserController::class, 'showProposers']);
+
 //Auth
 Route::get('/register', [RegisteredUserController::class, 'create']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
@@ -23,12 +28,14 @@ Route::post('/logout', [SessionController::class, 'destroy']);
 
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
+Route::get('/users/{user}', [UserController::class, 'show']);
 Route::get('/users/{user}/books', [UserController::class, 'showBooks']);
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
 
-Route::post('/users/{user}/books/{book}/{state}', [UserController::class, 'addBook']);
+Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook']);
 Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook']);
 
+//Books
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades

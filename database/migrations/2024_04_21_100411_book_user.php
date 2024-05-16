@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('book_user', function (Blueprint $table) {
 
-            $table->foreignIdFor(Book::class)->constrained(column: 'ISBN')->cascadeOnDelete();
+            $table->foreignIdFor(Book::class)->constrained('books')->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->boolean("onLoan")->default(false);
             $table->boolean("onTrade")->default(false);
             $table->timestamps();
-            $table->primary(["book_ISBN", "user_id"]);
+            $table->primary(["book_id", "user_id"]);
         });
     }
 

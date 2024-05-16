@@ -26,7 +26,7 @@ class TradeRequestPolicy
 
     public function resolveRequest(User $user, User $sender, Book $requestedBook, Book $proposedBook):bool
     {
-        $request = TradeRequest::find([$sender->id, $user->id, $proposedBook->ISBN, $requestedBook->ISBN]);
+        $request = TradeRequest::find([$sender->id, $user->id, $proposedBook->id, $requestedBook->id]);
         return $request != null && $request->response === null;
     }
 }

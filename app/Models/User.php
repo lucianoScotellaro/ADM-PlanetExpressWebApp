@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     public function books(): BelongsToMany
     {
-        return $this->belongsToMany(Book::class, relatedKey: 'ISBN')
+        return $this->belongsToMany(Book::class)
             ->withTimestamps()
             ->withPivot('onLoan')
             ->withPivot('onTrade');
