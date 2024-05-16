@@ -9,33 +9,34 @@ use Illuminate\Http\Request;
 
 class TradeRequestController extends Controller
 {
-    public function index(User $receiver)
+    public function index()
     {
-        return view('trades.received.index', ['requests'=>$receiver->pendingReceivedTradeRequests]);
+        return view('trades.received.index', ['requests'=>auth()->user()->pendingReceivedTradeRequests]);
     }
 
     public function show(User $receiver, Book $requestedBook){
         session(['receiver'=>$receiver->id,'requestedBook'=>$requestedBook->id]);
-        $activeUser = User::find(2);
-        return view('trades.show-propose',['user'=>$activeUser,'books'=>$activeUser->books]);
+        $user = auth()->user();
+        return view('trades.show-propose',['user'=>$user,'books'=>$user->books]);
     }
 
     public function store(Book $proposedBook){
-        $activeUser = User::find(2);
+        $user = auth()->user();
 
         TradeRequest::create([
             'receiver_id'=>session('receiver'),
-            'sender_id'=>$activeUser->id,
+            'sender_id'=>$user->id,
             'requested_book_id'=>session('requestedBook'),
             'proposed_book_id'=>$proposedBook->id
         ]);
+        session()->forget(['receiver','requestedBook']);
 
         return redirect('/');
     }
 
     public function update(User $sender, Book $requestedBook, Book $proposedBook){
-        $activeUser = User::find(1);
-        $request = TradeRequest::find([$sender->id, $activeUser->id, $proposedBook->id, $requestedBook->id]);
+        $user = auth()->user();
+        $request = TradeRequest::find([$sender->id, $user->id, $proposedBook->id, $requestedBook->id]);
 
         if(request()->is('trades/requests/accept/*')){
             $request->update([
@@ -49,6 +50,6 @@ class TradeRequestController extends Controller
             session(['success'=>'Richiesta rifiutata con successo']);
         }
 
-        return redirect('/trades/requests/received/'.$activeUser->id);
+        return redirect('/trades/requests/received');
     }
 }

@@ -5,16 +5,9 @@ use App\Models\User;
 
 it('renders user\'s pending received trade requests', function () {
     $user = User::factory()->create();
-    login($user)->get('trades/requests/received/'.$user->id)
+    login($user)->get('trades/requests/received')
         ->assertStatus(200)
         ->assertViewIs('trades.received.index');
-});
-
-it('doesn\'t render another user\'s pending received trade requests page', function () {
-    $user = User::factory()->create();
-    $anotherUser = User::factory()->create();
-    login($user)->get('trades/requests/received/'.$anotherUser->id)
-        ->assertStatus(403);
 });
 
 it('can ask for a trade request',function (){

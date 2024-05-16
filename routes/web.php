@@ -17,7 +17,7 @@ Route::get('/', function () {
 //Auth
 Route::get('/register', [RegisteredUserController::class, 'create']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
-Route::get('/login', [SessionController::class, 'create']);
+Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store']);
 Route::post('/logout', [SessionController::class, 'destroy']);
 
@@ -32,16 +32,18 @@ Route::get('/users/{user}', [UserController::class, 'show']);
 Route::get('/users/{user}/books', [UserController::class, 'showBooks']);
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
 
-Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook']);
-Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook']);
+Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook'])
+    ->middleware('auth');
+
+Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook'])
+    ->middleware('auth')    ;
 
 //Books
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades
-Route::get('/trades/requests/received/{receiver}', [TradeRequestController::class, 'index'])
-    ->middleware('auth')
-    ->can('seePendingRequests', [TradeRequest::class, 'receiver']);
+Route::get('/trades/requests/received', [TradeRequestController::class, 'index'])
+    ->middleware('auth');
 
 Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
     ->middleware('auth')
@@ -60,9 +62,8 @@ Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [T
     ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
 
 //Loans
-Route::get('/loans/requests/received/{receiver}', [LoanRequestController::class, 'index'])
-    ->middleware('auth')
-    ->can('seePendingRequests', [LoanRequest::class, 'receiver']);
+Route::get('/loans/requests/received', [LoanRequestController::class, 'index'])
+    ->middleware('auth');
 
 Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])
     ->middleware('auth')
