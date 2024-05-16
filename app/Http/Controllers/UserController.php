@@ -38,7 +38,7 @@ class UserController extends Controller
 
         $books = Book::searchOn($parameters, $searchOn);
         return view('users.search-results', [
-            'user' => User::find(1),
+            'user' => auth()->user(),
             'books' => $books
         ]);
     }
@@ -46,7 +46,7 @@ class UserController extends Controller
     public function showProposers(Book $book){
         return view('users.proposers-index',[
             'book' => $book,
-            'proposers' =>  $book->proposers()->get()->where('id', '!=',1)
+            'proposers' =>  $book->proposers()->get()->where('id', '!=',auth()->id())
         ]);
     }
 
@@ -88,7 +88,7 @@ class UserController extends Controller
         catch (Exception $exception)
         {
             $user->books()->updateExistingPivot($book->id, [$state=>true]);
-            $message = 'Book updated successfully';
+            $message = 'Book updated successfully!';
         }
         return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
     }
@@ -96,13 +96,16 @@ class UserController extends Controller
     public function removeBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
         $this->validateState($state);
+        $bookInList = $state == 'onloan' ? $user->booksOnLoan()->contains($book) : $user->booksOnTrade()->contains($book);
 
-        $removed = $user->books()->updateExistingPivot($book->id, [$state=>false]);
-        $message = $removed ? 'Book removed successfully' : 'Book not in your list';
+        if(!$bookInList){
+            abort(400);
+        }
 
+        $user->books()->updateExistingPivot($book->id, [$state=>false]);
         $this->cleanBookUser($user);
 
-        return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
+        return redirect('/users/'.$user->id.'/books/'.$state)->with('message','Book removed successfully');
     }
 
     private function cleanBookUser(User $user): void

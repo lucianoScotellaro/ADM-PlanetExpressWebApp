@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('expiration')->nullable()->default(null);
             $table->boolean('response')->nullable()->default(null);
             $table->timestamps();
+            $table->primary(['receiver_id', 'sender_id', 'requested_book_id']);
         });
     }
 

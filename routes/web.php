@@ -6,6 +6,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\LoanRequestController;
 use App\Http\Controllers\TradeRequestController;
 use App\Http\Controllers\UserController;
+use App\Models\Book;
 use App\Models\LoanRequest;
 use App\Models\TradeRequest;
 use Illuminate\Support\Facades\Route;
@@ -14,17 +15,17 @@ Route::get('/', function () {
     return view('home');
 });
 
+//Auth
+Route::get('/register', [RegisteredUserController::class, 'create']);
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::get('/login', [SessionController::class, 'create'])->name('login');
+Route::post('/login', [SessionController::class, 'store']);
+Route::post('/logout', [SessionController::class, 'destroy']);
+
 //Users
 Route::get('/users/search/form', [UserController::class, 'searchForm']);
 Route::get('/users/search', [UserController::class, 'search']);
 Route::get('users/search/proposers/{book}', [UserController::class, 'showProposers']);
-
-//Auth
-Route::get('/register', [RegisteredUserController::class, 'create']);
-Route::post('/register', [RegisteredUserController::class, 'store']);
-Route::get('/login', [SessionController::class, 'create']);
-Route::post('/login', [SessionController::class, 'store']);
-Route::post('/logout', [SessionController::class, 'destroy']);
 
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
@@ -32,20 +33,24 @@ Route::get('/users/{user}', [UserController::class, 'show']);
 Route::get('/users/{user}/books', [UserController::class, 'showBooks'])->middleware('auth');
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
 
-Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook']);
-Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook']);
+Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook'])
+    ->middleware('auth')
+    ->can('addBook', [Book::class, 'user', 'state']);
+
+Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'removeBook'])
+    ->middleware('auth')
+    ->can('removeBook', [Book::class, 'user', 'book', 'state']);
 
 //Books
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades
-Route::get('/trades/requests/received/{receiver}', [TradeRequestController::class, 'index'])
-    ->middleware('auth')
-    ->can('seePendingRequests', [TradeRequest::class, 'receiver']);
+Route::get('/trades/requests/received', [TradeRequestController::class, 'index'])
+    ->middleware('auth');
 
 Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
     ->middleware('auth')
-    ->can('requestBook', [TradeRequest::class, 'receiver']);
+    ->can('requestBook', [TradeRequest::class, 'receiver', 'requestedBook']);
 
 Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store'])
     ->middleware('auth')
@@ -60,9 +65,12 @@ Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [T
     ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
 
 //Loans
-Route::get('/loans/requests/received/{receiver}', [LoanRequestController::class, 'index'])
+Route::post('/loans/ask/{receiver}/{requestedBook}', [LoanRequestController::class, 'store'])
     ->middleware('auth')
-    ->can('seePendingRequests', [LoanRequest::class, 'receiver']);
+    ->can('requestBook', [LoanRequest::class, 'receiver', 'requestedBook']);
+
+Route::get('/loans/requests/received', [LoanRequestController::class, 'index'])
+    ->middleware('auth');
 
 Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])
     ->middleware('auth')

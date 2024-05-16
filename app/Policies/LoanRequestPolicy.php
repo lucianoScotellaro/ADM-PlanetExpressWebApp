@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class LoanRequestPolicy
 {
-    public function seePendingRequests(User $user, User $receiver): bool
+    public function requestBook(User $user, User $receiver, Book $requestedBook):bool
     {
-        return $user->is($receiver);
+        return !$user->is($receiver) && $receiver->books->contains($requestedBook);
     }
-
     public function resolveRequest(User $user, User $sender, Book $requestedBook): bool
     {
         $request = LoanRequest::find([$user->id, $sender->id, $requestedBook->id]);

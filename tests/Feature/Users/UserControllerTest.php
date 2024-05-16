@@ -72,11 +72,51 @@ it('should add a book on loan or on trade for a user', function (User $user, Boo
     [fn() => userWithBooks(), fn() => Book::factory()->create(), 'ontrade']
 ]);
 
+it('should not add a book on loan or on trade for a user if he is not the currently authenticated user', function(String $state){
+    $user = User::factory()->create();
+    $anotherUser = User::factory()->create();
+    $book = Book::factory()->create();
+
+    login($user)->post('/users/'.$anotherUser->id.'/books/'.$book->id.'/'.$state)
+        ->assertStatus(403);
+})->with([
+    'onloan',
+    'ontrade'
+]);
+
+it('should not remove a book from user\'s on loan or on trade list if the user is not the currently authenticated user', function(String $state){
+    $user = User::factory()->create();
+    $anotherUser = userWithBooks();
+
+    login($user)->delete('/users/'.$anotherUser->id.'/books/'.$anotherUser->books()->first()->id.'/'.$state)
+        ->assertStatus(403);
+})->with([
+    'onloan',
+    'ontrade'
+]);
+
+it('should not remove a book from user\'s on loan or on trade list if the book is not in list', function(String $state){
+    $user = User::factory()->create();
+    $book = Book::factory()->create();
+
+    if($state == 'onloan'){
+        $user->books()->attach($book->id, ['onTrade'=>true]);
+    }else{
+        $user->books()->attach($book->id, ['onLoan'=>true]);
+    }
+
+    login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/'.$state)
+        ->assertStatus(400);
+})->with([
+    'onloan',
+    'ontrade'
+]);
+
 it('should not add book on loan or on trade for a user when \'state\' is not valid', function(String $state){
     $user = User::factory()->create();
     $book = Book::factory()->create();
     login()->post('/users/'.$user->id.'/books/'.$book->id.'/'.$state)
-        ->assertStatus(404);
+        ->assertStatus(403);
 })->with([
     fake()->word()
 ]);
@@ -94,27 +134,20 @@ it('should not fail adding a book already in loans or trades list', function (Us
     [fn() => userWithBooks(), fn() => Book::factory()->create(), 'ontrade']
 ]);
 
-it("should render user's books page for invalid URL while adding a book", function (User $user, Book $book)
+it('should manage adding a book already in loans or trades list', function (String $state)
 {
-    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/random_string');
-    expect($response)
-        ->getStatusCode()->toBe(302)
-        ->assertRedirect('/users/'.$user->id.'/books')
-        ->assertSessionHas('message');
-})->with([
-    [fn() => userWithBooks(), fn() => Book::factory()->create()]
-])->skip();
+    $user = User::factory()->create();
+    $book = Book::factory()->create();
+    $user->books()->attach($book->id, [$state=>true]);
 
-it('should be blocked from adding a book already in loans list', function (User $user, Book $book)
-{
-    $user->books()->attach($book->id, ['onLoan'=>true]);
-
-    $response = login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/onloan');
-    expect($response)
-        ->getStatusCode()->toBe(403);
+    login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/'.$state)
+        ->assertStatus(302)
+        ->assertRedirect('/users/'.$user->id.'/books/'.$state)
+        ->assertSessionHas('message','Book updated successfully!');
 })->with([
-    [fn() => userWithBooks(), fn() => Book::factory()->create()]
-])->skip();
+    'onloan',
+    'ontrade'
+]);
 
 
 it('should remove a book from the loans or trades list of the user', function (User $user, String $state)
@@ -135,42 +168,10 @@ it('should not remove a book from loans or trades list of a user if \'state\' is
     $user = User::factory()->create();
     $book = Book::factory()->create();
     $user->books()->attach($book->id, ['onLoan'=>true]);
-    login()->delete('/users/'.$user->id.'/books/'.$book->id.'/'.$state)
+    login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/'.$state)
         ->assertStatus(404);
 })->with([
     fake()->word()
-]);
-
-it("should render user's books page for invalid URL while removing a book", function (User $user, Book $book)
-{
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/random_string');
-    expect($response)
-        ->getStatusCode()->toBe(302)
-        ->assertRedirect('/users/'.$user->id.'/books')
-        ->assertSessionHas('message');
-})->with([
-    [fn() => userWithBooks(), fn() => Book::factory()->create()]
-])->skip();
-
-it('should be blocked from removing a book not in loans list', function (User $user, Book $book)
-{
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/onloan');
-    expect($response)
-        ->getStatusCode()->toBe(403);
-})->with([
-    [fn() => userWithBooks(), fn() => Book::factory()->create()]
-])->skip();
-
-it("'should render correct message removing a book not in user's books list", function (User $user, Book $book, String $state)
-{
-    $response = login($user)->delete('/users/'.$user->id.'/books/'.$book->id.'/'.$state);
-    expect($response)
-        ->getStatusCode()->toBe(302)
-        ->assertRedirect('/users/'.$user->id.'/books/'.$state)
-        ->assertSessionHas('message', 'Book not in your list');
-})->with([
-    [fn() => userWithBooks(), fn() => Book::factory()->create(), 'onloan'],
-    [fn() => userWithBooks(), fn() => Book::factory()->create(), 'ontrade']
 ]);
 
 it('should render requestable books page', function(){

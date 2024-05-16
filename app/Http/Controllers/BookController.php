@@ -24,7 +24,7 @@ class BookController extends Controller
         }
 
         return view('books.search-results', [
-            'user'=>User::find(1),
+            'user'=>auth()->user(),
             'books'=>$this->fetchBooks(),
             'currentPageNumber'=>request()->query('pageNumber')
         ]);

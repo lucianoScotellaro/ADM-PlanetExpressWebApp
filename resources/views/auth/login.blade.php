@@ -3,7 +3,7 @@
         <x-navbar>
             <div class="nav-button-container">
                 <a class="nav-btn" href="/">Back home</a>
-                <a class="nav-btn" href="/login">Register</a>
+                <a class="nav-btn" href="/register">Register</a>
             </div>
         </x-navbar>
     </x-slot:navbar>
