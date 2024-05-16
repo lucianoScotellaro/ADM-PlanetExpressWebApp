@@ -43,6 +43,13 @@
         </div>
     </x-slot:header>
     <main class="books-list-container">
+        @if(session()->has('success'))
+            <p>{{session()->get('success')}}</p>
+        @elseif(session()->has('notInListError'))
+            <p>{{session()->get('notInListError')}}</p>
+        @elseif(session()->has('alreadyExistsError'))
+            <p>{{session()->get('alreadyExistsError')}}</p>
+        @endif
         <ul class="books-list">
             @foreach($books as $book)
                 <li class="book-list-element">

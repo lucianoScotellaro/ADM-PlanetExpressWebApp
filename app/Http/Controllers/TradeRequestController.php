@@ -15,12 +15,18 @@ class TradeRequestController extends Controller
     }
 
     public function show(User $receiver, Book $requestedBook){
+        $inTrades = $receiver->booksOnTrade()->contains($requestedBook);
+        if(!$inTrades){
+            return redirect('/users/'.$receiver->id.'/books/ontrade')->with('notInListError', 'Selected book is not available for trades.');
+        }
+
         session(['receiver'=>$receiver->id,'requestedBook'=>$requestedBook->id]);
         $user = auth()->user();
         return view('trades.show-propose',['user'=>$user,'books'=>$user->books]);
     }
 
     public function store(Book $proposedBook){
+        $redirectURL = '/users/'.session('receiver').'/books/ontrade';
         $user = auth()->user();
 
         try {
@@ -30,13 +36,12 @@ class TradeRequestController extends Controller
                 'requested_book_id'=>session('requestedBook'),
                 'proposed_book_id'=>$proposedBook->id
             ]);
-            session(['success'=>'Request sent successfully!']);
+            session()->forget(['receiver','requestedBook']);
+            return redirect($redirectURL)->with('success','Request sent successfully!');
         }catch (\Exception $e){
-            session(['alreadyExistsError'=>'You have already sent this user this trade request.']);
+            session()->forget(['receiver','requestedBook']);
+            return redirect($redirectURL)->with('alreadyExistsError','You have already sent this user this trade request.');
         }
-        session()->forget(['receiver','requestedBook']);
-
-        return redirect('/');
     }
 
     public function update(User $sender, Book $requestedBook, Book $proposedBook){
@@ -47,14 +52,12 @@ class TradeRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            session(['success'=>'Request accepted successfully!']);
+            return redirect('/trades/requests/received')->with('success','Request accepted successfully!');
         }elseif('trades/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            session(['success'=>'Request refused successfully!']);
+            return redirect('/trades/requests/received')->with('success','Request refused successfully!');
         }
-
-        return redirect('/trades/requests/received');
     }
 }

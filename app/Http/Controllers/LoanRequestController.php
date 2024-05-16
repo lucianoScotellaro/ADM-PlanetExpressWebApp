@@ -14,6 +14,13 @@ class LoanRequestController extends Controller
     }
 
     public function store(User $receiver, Book $requestedBook){
+        $redirectURL = '/users/'.$receiver->id.'/books/onloan';
+
+        $inLoans = $receiver->booksOnLoan()->contains($requestedBook);
+        if(!$inLoans){
+            return redirect($redirectURL)->with('notInListError', 'Selected book is not available for loan.');
+        }
+
         $validated = request()->validate([
             'expiration'=>['required','int','min:14', 'max:60']
         ]);
@@ -25,15 +32,15 @@ class LoanRequestController extends Controller
                 'requested_book_id'=>$requestedBook->id,
                 'expiration'=>$validated['expiration']
             ]);
-            session(['success'=>'Request sent successfully!']);
+            return redirect($redirectURL)->with('success','Request sent successfully!');
         }catch (\Exception $e){
-            session(['alreadyExistsError'=>'You have already sent this user this loan request']);
+            return redirect($redirectURL)->with('alreadyExistsError','You have already sent this user this loan request');
         }
-
-        return redirect('/');
     }
 
     public function update(User $sender, Book $requestedBook){
+        $redirectURL = '/loans/requests/received';
+
         $receiver = auth()->user();
         $request = LoanRequest::find([$receiver->id, $sender->id, $requestedBook->id]);
 
@@ -41,14 +48,12 @@ class LoanRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
-            session(['success'=>'Richiesta accettata con successo.']);
+            return redirect($redirectURL)->with('success','Request accepted successfully!');
         }elseif('loans/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            session(['success'=>'Richiesta rifiutata con successo.']);
+            return redirect($redirectURL)->with('success','Request refused successfully!');
         }
-
-        return redirect('/loans/requests/received');
     }
 }

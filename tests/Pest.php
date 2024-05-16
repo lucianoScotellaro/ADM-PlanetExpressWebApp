@@ -88,6 +88,18 @@ function userWithTradeableBooks():User
     return $user;
 }
 
+function userWithLoanableBooks():User
+{
+    $user = User::factory()->create();
+    $books = Book::factory(10)->create();
+
+    $books->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->id, ['onLoan'=>true]);
+    });
+    return $user;
+}
+
 function login ($user = null)
 {
     return test()->actingAs($user ?? User::factory()->create());

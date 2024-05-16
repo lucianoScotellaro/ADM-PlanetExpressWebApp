@@ -75,3 +75,18 @@ it('should not store a book that is already in DB', function(String $bookID, Str
     'onloan',
     'ontrade'
 ]);
+
+it('should remove \'noParametersError\' from session when a search with parameters is performed',function(String $queryString){
+    session(['noParametersError' => 'At least one parameter is required.']);
+    login()->get('books/search'.$queryString)
+        ->assertStatus(200)
+        ->assertSessionMissing('noParametersError');
+})->with([
+    '?title=Divina&author=Dante&category=Classic&pageNumber=1',
+    '?title=Divina&author=&category=Classic&pageNumber=1',
+    '?title=Divina&author=Dante&category=&pageNumber=1',
+    '?title=&author=Dante&category=Classic&pageNumber=1',
+    '?title=Divina&author=&category=&pageNumber=1',
+    '?title=&author=Dante&category=&pageNumber=1',
+    '?title=&author=&category=Classic&pageNumber=1'
+]);
