@@ -10,65 +10,111 @@ it('renders user\'s pending received trade requests', function () {
         ->assertViewIs('trades.received.index');
 });
 
-it('renders trade request \'propose\' page',function (){
-    $receiver = userWithBooks();
+it('doesn\'t render another user\'s pending received trade requests page', function () {
+    $user = User::factory()->create();
+    $anotherUser = User::factory()->create();
+    login($user)->get('trades/requests/received/'.$anotherUser->id)
+        ->assertStatus(403);
+});
 
-    login()->get('trades/ask/'.$receiver->id.'/'.$receiver->books()->first()->ISBN)
+it('can ask for a trade request',function (){
+    $receiver = userWithBooks();
+    $sender = User::factory()->create();
+
+    login($sender)->get('trades/ask/'.$receiver->id.'/'.$receiver->books()->first()->id)
         ->assertStatus(200)
-        ->assertSessionHas(['receiver'=>$receiver->id,'requestedBook'=>$receiver->books()->first()->ISBN])
+        ->assertSessionHas(['receiver'=>$receiver->id,'requestedBook'=>$receiver->books()->first()->id])
         ->assertViewIs('trades.show-propose');
 });
 
-it('can create pending trade request', function(){
+it('cannot ask for a trade request to himself', function(){
+    $user = userWithBooks();
+
+    login($user)->get('trades/ask/'.$user->id.'/'.$user->books()->first()->id)
+        ->assertStatus(403);
+});
+
+it('can create pending trade request proposing his book', function(){
     $receiver = userWithBooks();
     $sender = userWithBooks();
-    session(['receiver'=>$receiver->id, 'requestedBook'=>$receiver->books()->first()->ISBN]);
+    session(['receiver'=>$receiver->id, 'requestedBook'=>$receiver->books()->first()->id]);
 
     expect($receiver->pendingReceivedTradeRequests()->count())->toBe(0);
 
-    login()->post('/trades/propose/'.$sender->books()->first()->ISBN)
+    login($sender)->post('/trades/propose/'.$sender->books()->first()->id)
         ->assertStatus(302)
         ->assertRedirect('/');
 
     expect($receiver->pendingReceivedTradeRequests()->count())->toBe(1);
 });
 
-it('can accept pending trade request',function(){
+it('cannot create pending trade request proposing not his book', function(){
+    $receiver = userWithBooks();
+    $sender = userWithBooks();
+
+    login($sender)->post('/trades/propose/'.$receiver->books()->first()->id)
+        ->assertStatus(403);
+});
+
+it('can accept or refuse pending trade request',function(string $action){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
     TradeRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
-        'proposed_book_ISBN'=>$sender->books()->first()->ISBN,
+        'requested_book_id'=>$receiver->books()->first()->id,
+        'proposed_book_id'=>$sender->books()->first()->id,
         'response'=>null
     ]);
 
-    login($receiver)->get('trades/requests/accept/'.$sender->id.'/'.$receiver->books()->first()->ISBN.'/'.$sender->books()->first()->ISBN)
+    login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
         ->assertStatus(302)
+        ->assertSessionHas('success')
         ->assertRedirect('/trades/requests/received/'.$receiver->id);
 
-    $tradeRequest = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->ISBN, $receiver->books()->first()->ISBN]);
-    expect($tradeRequest->response)->toBe(1);
-});
+    $request = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->id, $receiver->books()->first()->id]);
 
-it('can refuse pending trade request', function(){
+    if($action == 'accept'){
+        expect($request->response)->toBe(1);
+    }elseif($action == 'refuse'){
+        expect($request->response)->toBe(0);
+    }
+
+})->with([
+    'accept',
+    'refuse'
+]);
+
+it('cannot accept or refuse resolved request', function(string $action, bool $response){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
     TradeRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_ISBN'=>$receiver->books()->first()->ISBN,
-        'proposed_book_ISBN'=>$sender->books()->first()->ISBN,
-        'response'=>null
+        'requested_book_id'=>$receiver->books()->first()->id,
+        'proposed_book_id'=>$sender->books()->first()->id,
+        'response'=>$response
     ]);
 
-    login($receiver)->get('trades/requests/refuse/'.$sender->id.'/'.$receiver->books()->first()->ISBN.'/'.$sender->books()->first()->ISBN)
-        ->assertStatus(302)
-        ->assertRedirect('/trades/requests/received/'.$receiver->id);
+    login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
+        ->assertStatus(403);
+})->with([
+    'accept',
+    'refuse'
+])->with([
+    true,
+    false
+]);
 
-    $tradeRequest = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->ISBN, $receiver->books()->first()->ISBN]);
-    expect($tradeRequest->response)->toBe(0);
-});
+it('cannot accept or refuse non-existent trade request', function(string $action){
+    $receiver = userWithBooks();
+    $sender = userWithBooks();
+
+    login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
+        ->assertStatus(403);
+})->with([
+    'accept',
+    'refuse'
+]);

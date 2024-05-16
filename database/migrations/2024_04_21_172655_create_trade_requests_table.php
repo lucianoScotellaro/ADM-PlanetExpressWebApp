@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('trade_requests', function (Blueprint $table) {
             $table->foreignIdFor(User::class,'receiver_id')->constrained('users')->cascadeOnDelete();
             $table->foreignIdFor(User::class,'sender_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignIdFor(Book::class,'proposed_book_ISBN')->constrained('books','ISBN')->cascadeOnDelete();
-            $table->foreignIdFor(Book::class,'requested_book_ISBN')->constrained('books','ISBN')->cascadeOnDelete();
+            $table->foreignIdFor(Book::class,'proposed_book_id')->constrained('books')->cascadeOnDelete();
+            $table->foreignIdFor(Book::class,'requested_book_id')->constrained('books')->cascadeOnDelete();
             $table->boolean('response')->nullable()->default(null);
             $table->timestamps();
-            $table->primary(['receiver_id', 'sender_id', 'proposed_book_ISBN', 'requested_book_ISBN']);
+            $table->primary(['receiver_id', 'sender_id', 'proposed_book_id', 'requested_book_id']);
         });
     }
 

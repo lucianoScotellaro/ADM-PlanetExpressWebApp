@@ -72,7 +72,18 @@ function userWithBooks():User
 
     $books->each(function ($book) use ($user)
     {
-        $user->books()->attach($book->ISBN, ['onLoan'=>fake()->boolean]);
+        $user->books()->attach($book->id, ['onLoan'=>fake()->boolean]);
+    });
+    return $user;
+}
+function userWithTradeableBooks():User
+{
+    $user = User::factory()->create();
+    $books = Book::factory(10)->create();
+
+    $books->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->id, ['onTrade'=>true]);
     });
     return $user;
 }

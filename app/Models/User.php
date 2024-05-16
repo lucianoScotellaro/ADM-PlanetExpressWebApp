@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     public function books(): BelongsToMany
     {
-        return $this->belongsToMany(Book::class, relatedKey: 'ISBN')
+        return $this->belongsToMany(Book::class)
             ->withTimestamps()
             ->withPivot('onLoan')
             ->withPivot('onTrade');
@@ -64,6 +64,11 @@ class User extends Authenticatable
     public function pendingReceivedTradeRequests(): HasMany
     {
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
+    }
+
+    public function pendingReceivedLoanRequests():HasMany
+    {
+        return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);
     }
 
     public function booksOnTrade(): Collection

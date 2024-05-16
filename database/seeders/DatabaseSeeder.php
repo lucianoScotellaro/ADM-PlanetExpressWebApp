@@ -15,13 +15,5 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory(2)->create();
-
-        Book::factory(10)->create()->each(function (Book $book) {
-            $book->users()->attach(1, ['onLoan'=>fake()->boolean()]);
-        });
-
-        Book::factory(10)->create()->each(function (Book $book) {
-           $book->users()->attach(2, ['onLoan'=>fake()->boolean()]);
-        });
     }
 }

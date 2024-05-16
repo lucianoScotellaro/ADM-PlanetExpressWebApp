@@ -10,12 +10,44 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
+
     public function show(User $user)
     {
         return view('users.show', ['user' => $user]);
+    }
+
+    public function searchForm()
+    {
+        return view('users.search-form');
+    }
+
+    public function search()
+    {
+        if(!$this->validateSearchParameters()){
+            return redirect('users/search/form');
+        }
+
+        $parameters = request()->query();
+        $searchOn = request()->query('searchOn');
+
+        $books = Book::searchOn($parameters, $searchOn);
+        return view('users.search-results', [
+            'user' => User::find(1),
+            'books' => $books
+        ]);
+    }
+
+    public function showProposers(Book $book){
+        return view('users.proposers-index',[
+            'book' => $book,
+            'proposers' =>  $book->proposers()->get()->where('id', '!=',1)
+        ]);
     }
 
     public function showBooks(User $user, String $state=null): Factory|View|Application
@@ -36,51 +68,71 @@ class UserController extends Controller
 
     public function booksCreate():View|Factory|Application
     {
-        return BookController::searchForm();
+        return app('App\Http\Controllers\BookController')->searchForm();
     }
 
-    public function addBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
+    public function addBook(User $user, String $bookID, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
-        if(in_array($state, ['onloan','ontrade']))
-        {
-            try
-            {
-                $user->books()->attach($book->ISBN, [$state=>true]);
-                $message = 'Book added successfully';
-            }
-            catch (Exception $exception)
-            {
-                $user->books()->updateExistingPivot($book->ISBN, [$state=>true]);
-                $message = 'Book updated successfully';
-            }
-            return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
+        $this->validateState($state);
+
+        $book = Book::find($bookID);
+        if($book == null){
+            $book = app('App\Http\Controllers\BookController')->store($bookID);
         }
-        return redirect('/users/'.$user->id.'/books')->with('message', 'Invalid URL');
+
+        try
+        {
+            $user->books()->attach($book->id, [$state=>true]);
+            $message = 'Book added successfully';
+        }
+        catch (Exception $exception)
+        {
+            $user->books()->updateExistingPivot($book->id, [$state=>true]);
+            $message = 'Book updated successfully';
+        }
+        return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
     }
 
     public function removeBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
-        if(in_array($state, ['onloan','ontrade']))
-        {
-            $removed = $user->books()->updateExistingPivot($book->ISBN, [$state=>false]);
-            $message = 'Book removed successfully';
+        $this->validateState($state);
 
-            if(!$removed){
-                $message = 'Book not in your list';
-            }
+        $removed = $user->books()->updateExistingPivot($book->id, [$state=>false]);
+        $message = $removed ? 'Book removed successfully' : 'Book not in your list';
 
-            $this->cleanBookUser($user);
+        $this->cleanBookUser($user);
 
-            return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
-        }
-        return redirect('/users/'.$user->id.'/books')->with('message', 'Invalid URL');
+        return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
     }
 
     private function cleanBookUser(User $user): void
     {
         $user->books()
-            ->wherePivot('onLoan', false)
-            ->wherePivot('onTrade', false)
+            ->wherePivot('onLoan', '=', 0)
+            ->wherePivot('onTrade', '=', 0)
             ->delete();
+    }
+
+    private function validateState(String $state): void
+    {
+        if(!in_array($state, ['onloan','ontrade']))
+        {
+            abort(404);
+        }
+    }
+
+    private function validateSearchParameters():bool
+    {
+        $currentPageNumber = request()->query('pageNumber');
+        if($currentPageNumber < 1){
+            return false;
+        }
+
+        $searchOn = request()->query('searchOn');
+        if(!in_array($searchOn, ['proposedBook','requestedBook'])){
+            return false;
+        }
+
+        return true;
     }
 }
