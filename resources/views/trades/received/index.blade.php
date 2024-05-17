@@ -1,64 +1,69 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Planet Express</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body>
-        <div class="flex flex-row">
-            <div class="basis-1/4"></div>
-            <div class="basis-3/4">
-                @if(session()->has('success'))
-                    <div class="flex justify-center my-3">
-                        <div class="rounded-md w-1/9 text-center text-white bg-green-600 bg-opacity-80 shadow-inner">
-                            <p class="my-1">{{session()->get('success')}}</p>
-                        </div>
-                    </div>
-                @endif
-                <ul role="list" class="divide-y divide-gray-100">
-                    @foreach($requests as $request)
-                        <li class="justify-between gap-x-6 py-5 h-full">
-                            <div class="flex basis-3/4">
-                                <div class="basis-3/7 inline-flex">
-                                    <x-book-image class="w-48"></x-book-image>
-                                    <div class="max-w-sm">
-                                        <div class="mb-3">
-                                            <p class="text-bold uppercase text-2xl">Cedi</p>
-                                            <x-book-title>{{$request->requestedBook->title}}</x-book-title>
-                                            <x-book-author>{{$request->requestedBook->author}}</x-book-author>
-                                        </div>
-                                        <div></div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-auto justify-center items-center">
-                                    <img src="{{asset('img/swap.png')}}" class="w-12 h-12" alt="">
-                                </div>
-                                <div class="basis-3/7 inline-flex">
-                                    <x-book-image class="w-48"></x-book-image>
-                                    <div class="max-w-sm">
-                                        <div class="mb-3">
-                                            <p class="text-bold uppercase text-2xl">Ricevi</p>
-                                            <x-book-title class="text-semibold">{{$request->proposedBook->title}}</x-book-title>
-                                            <x-book-author>{{$request->proposedBook->author}}</x-book-author>
-                                        </div>
-                                        <div></div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-auto justify-end items-center">
-                                    <div class="flex flex-col pr-5">
-                                        <x-button href="/trades/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->id}}/{{$request->proposedBook->id}}" class="mb-3">Accetta</x-button>
-                                        <x-button href="/trades/requests/refuse/{{$request->sender->id}}/{{$request->requestedBook->id}}/{{$request->proposedBook->id}}">Rifiuta</x-button>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
+<x-layout>
+    <x-slot:navbar>
+        <x-navbar>
+            <x-navbar-links-list>
+                @auth
+                    <li class="navbar-el"><x-navbar-link href="/">Home</x-navbar-link></li>
+                    <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books">Books</x-navbar-link></li>
+                    <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}">Profile</x-navbar-link></li>
+                    <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books/wishlist">Wishlist</x-navbar-link></li>
+                @endauth
+            </x-navbar-links-list>
+            <div class="nav-button-container">
             </div>
+        </x-navbar>
+    </x-slot:navbar>
+    <x-slot:header>
+        <div class="page-header">
+            <p>Received trade requests</p>
         </div>
-    </body>
-</html>
+    </x-slot:header>
+    <main class="books-list-container">
+        @if(session()->has('success'))
+            <div class="message-container text-success">
+                <p>{{session()->get('success')}}</p>
+            </div>
+        @endif
+        @if(!$requests->isEmpty())
+            <ul class="books-list">
+                @foreach($requests as $request)
+                    <li class="book-list-element">
+                        <div class="first-book">
+                            <figure class="book-image-figure">
+                                <img class="book-image" src="{{ $request->requestedBook->thumbnailUrl != null ? $request->requestedBook->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
+                            </figure>
+                            <div class="book-info-container">
+                                <p><strong>GIVE</strong></p>
+                                <p>Title: {{$request->requestedBook->title}}</p>
+                                <p>Author: {{$request->requestedBook->author}}</p>
+                                <p>Requested by: <strong>{{$request->sender->name}}</strong></p>
+                            </div>
+                        </div>
+                        <figure class="swap-image-figure">
+                            <img class="swap-image" src="{{asset('img/swap.png')}}" width="512" height="512" alt="Swap Image">
+                        </figure>
+                        <div class="second-book">
+                            <div class="book-info-container">
+                                <p><strong>GAIN</strong></p>
+                                <p>Title: {{$request->proposedBook->title}}</p>
+                                <p>Author: {{$request->proposedBook->author}}</p>
+                            </div>
+                            <figure class="book-image-figure">
+                                <img class="book-image" src="{{ $request->proposedBook->thumbnailUrl != null ? $request->proposedBook->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
+                            </figure>
+                        </div>
+                        <div class="book-actions-container actions-small">
+                            <x-button href="/trades/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->id}}/{{$request->proposedBook->id}}">Accept</x-button>
+                            <x-button href="/trades/requests/refuse/{{$request->sender->id}}/{{$request->requestedBook->id}}/{{$request->proposedBook->id}}">Refuse</x-button>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <div class="empty-list">
+                <p>There are no trade requests for you.</p>
+            </div>
+        @endif
+    </main>
+</x-layout>
+
