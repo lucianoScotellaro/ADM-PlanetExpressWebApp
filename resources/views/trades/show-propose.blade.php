@@ -1,46 +1,44 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Planet Express</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body>
-        <div class="flex flex-row h-screen">
-            <div class="basis-1/4"></div>
-            <div class="basis-3/4 overflow:auto">
-                <ul role="list" class="divide-y divide-gray-100">
-                    @foreach($books as $book)
-                        <li class="justify-between gap-x-6 py-5 h-full">
-                            <div class="flex flex-row min-w-0 gap-x-4">
-                                <div class="basis-3/4">
-                                    <div class="flex flex-row">
-                                        <x-book-image class="w-1/6"></x-book-image>
-                                        <div class="basis-5/6 flex flex-col">
-                                            <div class="mb-3">
-                                                <x-book-title>{{$book->title}}</x-book-title>
-                                                <x-book-author>{{$book->author}}</x-book-author>
-                                            </div>
-                                            <div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex basis-1/6 justify-items-center items-center">
-                                    <div class="flex flex-col w-2/3">
-                                        <form method="POST" action="/trades/propose/{{$book->id}}">
-                                            @csrf
-                                            <x-form-button>Proponi</x-form-button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
+<x-layout>
+    <x-slot:navbar>
+        <x-navbar>
+            <x-navbar-links-list>
+            </x-navbar-links-list>
+            <div class="nav-button-container">
             </div>
+        </x-navbar>
+    </x-slot:navbar>
+    <x-slot:header>
+        <div class="page-header">
+            <p>Select a book to trade!</p>
         </div>
-    </body>
-</html>
+    </x-slot:header>
+    <main class="books-list-container">
+        @if(!$books->isEmpty())
+            <ul class="books-list">
+                @foreach($books as $book)
+                    <li class="book-list-element">
+                        <figure class="book-image-figure">
+                            <img class="book-image" src="{{ $book->thumbnailUrl != null ? $book->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
+                        </figure>
+                        <div class="book-info-container">
+                            <p>Title: {{ $book->title }}</p>
+                            <p>Author: {{ $book->author }}</p>
+                            <p>ID: {{ $book->id }}</p>
+                        </div>
+                        <div class="book-actions-container">
+                            <form id="propose-{{$book->id}}-form" method="POST" action="/trades/propose/{{$book->id}}" hidden>
+                                @csrf
+                            </form>
+                            <x-form-button form="propose-{{$book->id}}-form">Propose</x-form-button>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <div class="empty-list">
+                <p>You have no books to trade.</p>
+            </div>
+        @endif
+    </main>
+</x-layout>
+

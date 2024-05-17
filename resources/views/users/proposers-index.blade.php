@@ -1,32 +1,40 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Planet Express</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body>
-        <header>
-            <h1 class="text-center text-bold text-4xl">Utenti che cedono: {{$book->title}}</h1>
-        </header>
-        @foreach($proposers as $proposer)
-            <div class="flex flex-row justify-between m-5 border-solid border-4 border-gray-200 items-center rounded-md">
-                <div class="basis-1/2 inline-flex m-2">
-                    <div>
-                        <x-book-image src="{{asset('img/profile-image-not-found.jpg')}}" class="w-1/6"></x-book-image>
-                    </div>
-                    <div>
-                        <x-book-title>{{ $proposer->name }}</x-book-title>
-                        <x-book-author>{{ $proposer->email }}</x-book-author>
-                    </div>
-                </div>
-                <div class="flex basis-1/2 justify-end items-center">
-                    <x-button class="m-2" href="{{'/users/'.$proposer->id}}">Visualizza profilo</x-button>
-                </div>
+<x-layout>
+    <x-slot:navbar>
+        <x-navbar>
+            <x-navbar-links-list>
+            </x-navbar-links-list>
+            <div class="nav-button-container">
+                <a class="nav-btn" href="/users/search/form">Back to form</a>
             </div>
-        @endforeach
-    </body>
-</html>
+        </x-navbar>
+    </x-slot:navbar>
+    <x-slot:header>
+        <div class="page-header">
+            <p>Proposers for this book!</p>
+        </div>
+    </x-slot:header>
+    <main class="books-list-container">
+        @if(!$proposers->isEmpty())
+            <ul class="books-list">
+                @foreach($proposers as $proposer)
+                    <li class="book-list-element">
+                        <figure class="book-image-figure">
+                            <img class="book-image" src="{{asset('img/profile-image-not-found.jpg')}}" width="290" height="440" alt="Book image"/>
+                        </figure>
+                        <div class="book-info-container">
+                            <p>Name: {{ $proposer->name }}</p>
+                            <p>Email: {{ $proposer->email }}</p>
+                        </div>
+                        <div class="book-actions-container">
+                            <x-button class="m-2" href="{{'/users/'.$proposer->id}}">See profile</x-button>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <div class="empty-list">
+                <p>No proposers found.</p>
+            </div>
+        @endif
+    </main>
+</x-layout>
