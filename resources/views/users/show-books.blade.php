@@ -6,7 +6,7 @@
                     <li class="navbar-el"><x-navbar-link href="/">Home</x-navbar-link></li>
                     <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books">Books</x-navbar-link></li>
                     <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}">Profile</x-navbar-link></li>
-                    <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books/wishlist">Wishlist</x-navbar-link></li>
+                    <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books/onwishlist">Wishlist</x-navbar-link></li>
                 @endauth
             </x-navbar-links-list>
             <div class="nav-button-container">
@@ -25,7 +25,7 @@
                     List of books on trade
                 @elseif(request()->is('users/*/books/onloan'))
                     List of books on loan
-                @elseif(request()->is('users/*/books/wishlist'))
+                @elseif(request()->is('users/*/books/onwishlist'))
                     Wishlist
                 @elseif(request()->is('users/*/books*'))
                     Books on loan and on trade
@@ -38,7 +38,7 @@
                 <a href="/users/{{ $user->id }}/books/ontrade">See books on trade</a>
             </div>
             <div class="page-header">
-                <a href="/users/{{ $user->id }}/books/wishlist">See wishlist</a>
+                <a href="/users/{{ $user->id }}/books/onwishlist">See wishlist</a>
             </div>
         </div>
     </x-slot:header>
@@ -73,17 +73,28 @@
                             <p>ID: {{ $book->id }}</p>
                         </div>
                         <div class="book-actions-container">
+                            @if(request()->is('users/*/books/onwishlist'))
+                                <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onwishlist" method="POST" id="delete-book-{{ $book->id }}-on-wishlist" hidden>
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-wishlist">Delete from wishlist</x-form-button>
+                            @else
                             @can('editBooks', [\App\Models\Book::class, $user])
-                            <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onloan" method="POST" id="delete-book-{{ $book->id }}-on-loan" hidden>
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                            <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-form-button>
-                            <form action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" method="POST" id="delete-book-{{ $book->id }}-on-trade" hidden>
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                            <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
+                                @if(request()->is('users/*/books/onloan'))
+                                <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onloan" method="POST" id="delete-book-{{ $book->id }}-on-loan" hidden>
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-form-button>
+                                @endif
+                                @if(request()->is('users/*/books/ontrade'))
+                                <form action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" method="POST" id="delete-book-{{ $book->id }}-on-trade" hidden>
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
+                                @endif
                             @endcan
                             @cannot('editBooks', [\App\Models\Book::class, $user])
                             <div class="width-max inline-form-container">
@@ -98,7 +109,8 @@
                                 </form>
                             </div>
                             <x-button href="/trades/ask/{{$user->id}}/{{$book->id}}">Request on trade</x-button>
-                                @endcannot
+                            @endcannot
+                            @endif
                         </div>
                     </li>
                 @endforeach

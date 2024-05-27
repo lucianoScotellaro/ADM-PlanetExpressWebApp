@@ -753,6 +753,15 @@ button:hover {
     width: 100%;
 }
 
+.max-height-lg{
+    max-height: 250px;
+}
+
+.padding-y-sm{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 .no-top{
     top: 0;
 }

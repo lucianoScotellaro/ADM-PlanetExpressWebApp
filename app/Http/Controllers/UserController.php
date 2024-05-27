@@ -60,9 +60,13 @@ class UserController extends Controller
         {
             return view('users.show-books', ['user' => $user, 'books' => $user->booksOnTrade()]);
         }
+        elseif ($state === 'onwishlist')
+        {
+            return view('users.show-books', ['user'=> $user, 'books'=> $user->booksOnWishlist()]);
+        }
         else
         {
-           return view('users.show-books', ['user' => $user, 'books' => $user->books]);
+           return view('users.show-books', ['user' => $user, 'books' => $user->booksOnLoan()->merge($user->booksOnTrade())]);
         }
     }
 
@@ -87,8 +91,15 @@ class UserController extends Controller
         }
         catch (Exception $exception)
         {
-            $user->books()->updateExistingPivot($book->id, [$state=>true]);
-            $message = 'Book updated successfully!';
+            if($state != 'onwishlist' && !$user->booksOnWishlist()->contains($book))
+            {
+                $user->books()->updateExistingPivot($book->id, [$state=>true]);
+                $message = 'Book updated successfully!';
+            }
+            else
+            {
+                $message = 'This book is either on trade, on loan or already in wishlist';
+            }
         }
         return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
     }
@@ -96,7 +107,19 @@ class UserController extends Controller
     public function removeBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
         $this->validateState($state);
-        $bookInList = $state == 'onloan' ? $user->booksOnLoan()->contains($book) : $user->booksOnTrade()->contains($book);
+
+        if($state === 'onloan')
+        {
+            $bookInList = $user->booksOnLoan()->contains($book);
+        }
+        elseif ($state === 'ontrade')
+        {
+            $bookInList = $user->booksOnTrade()->contains($book);
+        }
+        else
+        {
+            $bookInList = $user->booksOnWishlist()->contains($book);
+        }
 
         if(!$bookInList){
             abort(400);
@@ -108,17 +131,18 @@ class UserController extends Controller
         return redirect('/users/'.$user->id.'/books/'.$state)->with('message','Book removed successfully');
     }
 
-    private function cleanBookUser(User $user): void
+    public function cleanBookUser(User $user): void
     {
         $user->books()
             ->wherePivot('onLoan', '=', 0)
             ->wherePivot('onTrade', '=', 0)
+            ->wherePivot('onWishlist', '=', 0)
             ->delete();
     }
 
     private function validateState(String $state): void
     {
-        if(!in_array($state, ['onloan','ontrade']))
+        if(!in_array($state, ['onloan','ontrade','onwishlist']))
         {
             abort(404);
         }
@@ -135,7 +159,6 @@ class UserController extends Controller
         if(!in_array($searchOn, ['proposedBook','requestedBook'])){
             return false;
         }
-
         return true;
     }
 }

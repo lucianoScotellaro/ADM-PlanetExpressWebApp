@@ -61,6 +61,16 @@ class User extends Authenticatable
         return $this->books()->wherePivot('onLoan', 1)->get();
     }
 
+    public function booksOnTrade(): Collection
+    {
+        return $this->books()->wherePivot('onTrade', 1)->get();
+    }
+
+    public function booksOnWishlist(): Collection
+    {
+        return $this->books()->wherePivot('onWishlist', 1)->get();
+    }
+
     public function pendingReceivedTradeRequests(): HasMany
     {
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
@@ -69,10 +79,5 @@ class User extends Authenticatable
     public function pendingReceivedLoanRequests():HasMany
     {
         return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);
-    }
-
-    public function booksOnTrade(): Collection
-    {
-        return $this->books()->wherePivot('onTrade', 1)->get();
     }
 }
