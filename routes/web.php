@@ -49,20 +49,16 @@ Route::get('/trades/requests/received', [TradeRequestController::class, 'index']
     ->middleware('auth');
 
 Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
-    ->middleware('auth')
-    ->can('requestBook', [TradeRequest::class, 'receiver', 'requestedBook']);
+    ->middleware('auth');
 
 Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store'])
-    ->middleware('auth')
-    ->can('proposeBook', [TradeRequest::class, 'proposedBook']);
+    ->middleware('auth');
 
 Route::get('/trades/requests/accept/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
+    ->middleware('auth');
 
 Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
+    ->middleware('auth');
 
 //Loans
 Route::post('/loans/ask/{receiver}/{requestedBook}', [LoanRequestController::class, 'store'])
