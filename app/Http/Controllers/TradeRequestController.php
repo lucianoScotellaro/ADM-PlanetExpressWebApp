@@ -36,6 +36,8 @@ class TradeRequestController extends Controller
                 'requested_book_id'=>session('requestedBook'),
                 'proposed_book_id'=>$proposedBook->id
             ]);
+
+            $user->books()->detach($proposedBook->id);
             session()->forget(['receiver','requestedBook']);
             return redirect($redirectURL)->with('success','Request sent successfully!');
         }catch (\Exception $e){
