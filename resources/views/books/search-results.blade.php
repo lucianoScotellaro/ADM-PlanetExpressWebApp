@@ -9,15 +9,13 @@
         </x-navbar>
     </x-slot:navbar>
     <x-slot:header>
-        <div class="page-header-container">
-            <div class="page-header">
-                <p>Those are the books found!</p>
-            </div>
+        <div class="page-header">
+            <p>Those are the books found!</p>
         </div>
     </x-slot:header>
-    <main class="books-list-container margin-top-lg">
+    <main class="books-list-container">
     @if(!empty($books))
-        <ul class="books-list justify-space-around">
+        <ul class="books-list">
             @foreach($books as $book)
                 <li class="book-list-element">
                     <figure class="book-image-figure">
@@ -52,7 +50,9 @@
             </li>
         </ul>
     @else
-        <p>La ricerca non ha prodotto risultati</p>
+        <div class="empty-list">
+            <p>No results found. Try with other parameters.</p>
+        </div>
         @if($currentPageNumber > 1)
         <div class="pagination-buttons">
             <x-button href="{{ preg_replace('/&pageNumber=[0-9]*/','&pageNumber='.($currentPageNumber - 1),request()->getRequestUri())}}">Previous</x-button>

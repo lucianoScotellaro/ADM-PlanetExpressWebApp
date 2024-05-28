@@ -41,7 +41,6 @@ body {
 
 main{
     position: relative;
-    top: 10vh;
     height: 90vh;
     background-size: cover;
     overflow: hidden;
@@ -49,7 +48,7 @@ main{
 
 .navbar {
     z-index:100;
-    position: fixed;
+    position: sticky;
     top: 0;
     background-color: var(--PLANET-GREEN);
     width: 100%;
@@ -65,21 +64,13 @@ main{
     background-position: bottom right;
 }
 
-.register, .login, .search{
-    top: -13vh;
-}
-
-.user-profile{
-    top: -10vh;
-}
-
 .login{
     background-position: bottom;
 }
 
 .page-header{
     z-index: 99;
-    position: sticky;
+    position: absolute;
     top: 0;
     left: 200px;
     height: 23vh;
@@ -100,6 +91,8 @@ main{
 }
 
 .user-profile-header{
+    position: absolute;
+    top: 0;
     display: inline-flex;
     width: 100%;
     justify-content: flex-end;
@@ -132,9 +125,38 @@ main{
 }
 
 .books-list-container{
-    top: -13vh;
-    margin-top: 60px;
+    position: relative;
+    top: 10vh;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: center;
     overflow: auto;
+}
+
+.message-container{
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+    height: 2rem;
+}
+
+.empty-list{
+    display: flex;
+    width: 50%;
+    max-width: 400px;
+    height: 3rem;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--PLANET-YELLOW);
+    border: 3px solid var(--PLANET-RED);
+    border-radius: 8px;
+    box-shadow: var(--PLANET-LIGHT-RED) 4px 4px;
+    justify-content: center;
+    align-items: center;
 }
 
 .signup-form,
@@ -356,7 +378,7 @@ button:hover {
     height: 50%;
     padding: 10px;
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .profile-info-container p{
@@ -423,12 +445,14 @@ button:hover {
 /* BOOKS LIST */
 
 .books-list{
+    position: absolute;
+    top: 50px;
     height: 100%;
     width: 100%;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 10px;
 }
 
@@ -662,6 +686,39 @@ button:hover {
     text-align: center;
 }
 
+/* OTHER */
+
+.swap-image-figure{
+    display: flex;
+    width: 10%;
+    max-width: 50px;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+}
+
+.swap-image{
+    width: 100%;
+    height: auto;
+}
+
+.first-book,
+.second-book{
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    margin: 0 8px;
+}
+
+.first-book .book-info-container,
+.second-book .book-info-container{
+    text-align: left;
+}
+
 /* MODIFIERS */
 
 /* GENERAL */
@@ -671,8 +728,21 @@ button:hover {
     text-decoration: underline;
 }
 
+.text-success{
+    color: green;
+    text-decoration: underline;
+}
+
 .margin-top-lg{
     margin-top: 120px;
+}
+
+.margin-top-md{
+    margin-top: 60px;
+}
+
+.margin-top-tw{
+    margin-top: 20px;
 }
 
 .margin-top-sm{
@@ -697,6 +767,9 @@ button:hover {
     justify-content: space-around;
 }
 
+.actions-small{
+    width: 25%;
+}
 /* BUTTON */
 
 .button-primary{

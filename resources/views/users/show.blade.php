@@ -32,7 +32,7 @@
         <div class="side-content-container">
             <div class="profile-info-container">
                 <figure class="profile-image-figure">
-                    <img class="profile-image" src="{{ asset('img/user-image-not-found.jpg') }}" width="1244" height="1063" alt="User image" />
+                    <img class="profile-image" src="{{ asset('img/profile-image-not-found.jpg') }}" width="1244" height="1063" alt="User image" />
                 </figure>
                 <p>Name: {{ $user->name }}</p>
                 <p>Email: {{ $user->email }}</p>

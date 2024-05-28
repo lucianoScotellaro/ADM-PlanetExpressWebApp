@@ -7,6 +7,8 @@
                     <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books">Books</x-navbar-link></li>
                     <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}">Profile</x-navbar-link></li>
                     <li class="navbar-el"><x-navbar-link href="/users/{{ auth()->id() }}/books/wishlist">Wishlist</x-navbar-link></li>
+                    <li class="navbar-el"><x-navbar-link href="/trades/requests/received">Trade</x-navbar-link></li>
+                    <li class="navbar-el"><x-navbar-link href="/loans/requests/received">Loan</x-navbar-link></li>
                 @endauth
                 @guest
                 @endguest
