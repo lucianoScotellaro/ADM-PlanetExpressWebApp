@@ -48,6 +48,7 @@ class LoanRequestController extends Controller
             $request->update([
                 'response'=>true
             ]);
+            $receiver->books()->detach($requestedBook->id);
             return redirect($redirectURL)->with('success','Request accepted successfully!');
         }elseif('loans/requests/refuse/*'){
             $request->update([
