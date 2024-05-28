@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 
 class TradeRequestController extends Controller
 {
+    public static String $usersBaseURL = '/users/';
+    public static String $onTradeBooks = '/books/ontrade';
+
     public function index()
     {
         return view('trades.received.index', ['requests'=>auth()->user()->pendingReceivedTradeRequests]);
@@ -18,12 +21,12 @@ class TradeRequestController extends Controller
         $user = auth()->user();
 
         if($user->is($receiver)){
-            return redirect('/users/'.$user->id.'/books/ontrade')->with('invalidRequest', 'Cannot ask for a book to yourself.');
+            return redirect(self::$usersBaseURL.$user->id.self::$onTradeBooks)->with('invalidRequest', 'Cannot ask for a book to yourself.');
         }
 
         $inTrades = $receiver->booksOnTrade()->contains($requestedBook);
         if(!$inTrades){
-            return redirect('/users/'.$receiver->id.'/books/ontrade')->with('notInListError', 'Selected book is not available for trades.');
+            return redirect(self::$usersBaseURL.$receiver->id.self::$onTradeBooks)->with('notInListError', 'Selected book is not available for trades.');
         }
 
         session(['receiver'=>$receiver->id,'requestedBook'=>$requestedBook->id]);
@@ -31,7 +34,7 @@ class TradeRequestController extends Controller
     }
 
     public function store(Book $proposedBook){
-        $redirectURL = '/users/'.session('receiver').'/books/ontrade';
+        $redirectURL = self::$usersBaseURL.session('receiver').self::$onTradeBooks;
         $user = auth()->user();
 
         $inBooksList = $user->books()->get()->contains($proposedBook->id);
@@ -55,15 +58,16 @@ class TradeRequestController extends Controller
     }
 
     public function update(User $sender, Book $requestedBook, Book $proposedBook){
+        $redirectURL = '/trades/requests/received';
         $user = auth()->user();
         $request = TradeRequest::find([$sender->id, $user->id, $proposedBook->id, $requestedBook->id]);
 
         if($request === null){
-            return redirect('/trades/requests/received')->with('notExistsError', 'Request does not exist.');
+            return redirect($redirectURL)->with('notExistsError', 'Request does not exist.');
         }
 
         if($request->response !== null){
-            return redirect('/trades/requests/received')->with('alreadyResolvedError', 'Request was already resolved.');
+            return redirect($redirectURL)->with('alreadyResolvedError', 'Request was already resolved.');
         }
 
         if(request()->is('trades/requests/accept/*')){
@@ -72,12 +76,11 @@ class TradeRequestController extends Controller
             ]);
             $user->books()->detach($requestedBook->id);
             $sender->books()->detach($proposedBook->id);
-            return redirect('/trades/requests/received')->with('success','Request accepted successfully!');
         }elseif('trades/requests/refuse/*'){
             $request->update([
                'response'=>false
             ]);
-            return redirect('/trades/requests/received')->with('success','Request refused successfully!');
         }
+        return redirect($redirectURL)->with('success','Request resolved successfully!');
     }
 }
