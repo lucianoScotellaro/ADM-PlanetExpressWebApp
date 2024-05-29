@@ -8,9 +8,15 @@ use App\Models\User;
 
 class LoanRequestController extends Controller
 {
-    public function index(){
+    public function index(String $type){
         $user = auth()->user();
-        return view('loans.received.index', ['user'=>$user, 'requests'=>$user->pendingReceivedLoanRequests]);
+
+        if(!in_array($type, ['received','sent'])){
+            return redirect('/');
+        }
+
+        $requests = $type == 'received' ? $user->pendingReceivedLoanRequests : $user->pendingSentLoanRequests;
+        return view('loans.'.$type, ['requests'=>$requests]);
     }
 
     public function store(User $receiver, Book $requestedBook){

@@ -12,9 +12,16 @@ class TradeRequestController extends Controller
     public static String $usersBaseURL = '/users/';
     public static String $onTradeBooks = '/books/ontrade';
 
-    public function index()
+    public function index(String $type)
     {
-        return view('trades.received.index', ['requests'=>auth()->user()->pendingReceivedTradeRequests]);
+        $user = auth()->user();
+
+        if(!in_array($type,['received','sent'])){
+            return redirect('/');
+        }
+
+        $requests = $type == 'received' ? $user->pendingReceivedTradeRequests : $user->pendingSentTradeRequests;
+        return view('trades.'.$type, ['requests' => $requests]);
     }
 
     public function show(User $receiver, Book $requestedBook){

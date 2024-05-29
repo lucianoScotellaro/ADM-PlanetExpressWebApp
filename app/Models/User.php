@@ -48,6 +48,7 @@ class User extends Authenticatable
         ];
     }
 
+    //Books Relationships
     public function books(): BelongsToMany
     {
         return $this->belongsToMany(Book::class)
@@ -61,18 +62,30 @@ class User extends Authenticatable
         return $this->books()->wherePivot('onLoan', 1)->get();
     }
 
+    public function booksOnTrade(): Collection
+    {
+        return $this->books()->wherePivot('onTrade', 1)->get();
+    }
+
+    //Trade Requests relationships
+    public function pendingSentTradeRequests(): HasMany
+    {
+        return $this->hasMany(TradeRequest::class, foreignKey: 'sender_id')->where('response', value: null)->with(['receiver','requestedBook','proposedBook']);
+    }
+
     public function pendingReceivedTradeRequests(): HasMany
     {
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
     }
 
+
+    //Loan Requests Relationships
+    public function pendingSentLoanRequests(): HasMany
+    {
+        return $this->hasMany(LoanRequest::class, foreignKey: 'sender_id')->where('response', value: null)->with(['receiver','requestedBook']);
+    }
     public function pendingReceivedLoanRequests():HasMany
     {
         return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);
-    }
-
-    public function booksOnTrade(): Collection
-    {
-        return $this->books()->wherePivot('onTrade', 1)->get();
     }
 }
