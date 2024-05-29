@@ -5,12 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\LoanRequest;
 use App\Models\User;
+use App\Traits\ValidateRequestsType;
 
 class LoanRequestController extends Controller
 {
-    public function index(){
+    use ValidateRequestsType;
+    public function index(String $type){
         $user = auth()->user();
-        return view('loans.received.index', ['user'=>$user, 'requests'=>$user->pendingReceivedLoanRequests]);
+
+        if(!$this->validateRequestsType($type)){
+            return redirect('/');
+        }
+
+        $requests = $type == 'received' ? $user->pendingReceivedLoanRequests : $user->pendingSentLoanRequests;
+        return view('loans.'.$type, ['requests'=>$requests]);
     }
 
     public function store(User $receiver, Book $requestedBook){

@@ -45,7 +45,7 @@ Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'rem
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades
-Route::get('/trades/requests/received', [TradeRequestController::class, 'index'])
+Route::get('/trades/requests/{type}', [TradeRequestController::class, 'index'])
     ->middleware('auth');
 
 Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
@@ -65,7 +65,7 @@ Route::post('/loans/ask/{receiver}/{requestedBook}', [LoanRequestController::cla
     ->middleware('auth')
     ->can('requestBook', [LoanRequest::class, 'receiver', 'requestedBook']);
 
-Route::get('/loans/requests/received', [LoanRequestController::class, 'index'])
+Route::get('/loans/requests/{type}', [LoanRequestController::class, 'index'])
     ->middleware('auth');
 
 Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])

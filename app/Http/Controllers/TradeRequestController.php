@@ -5,16 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Traits\ValidateRequestsType;
 
 class TradeRequestController extends Controller
 {
+    use ValidateRequestsType;
     public static String $usersBaseURL = '/users/';
     public static String $onTradeBooks = '/books/ontrade';
 
-    public function index()
+    public function index(String $type)
     {
-        return view('trades.received.index', ['requests'=>auth()->user()->pendingReceivedTradeRequests]);
+        $user = auth()->user();
+
+        if(!$this->validateRequestsType($type)){
+            return redirect('/');
+        }
+
+        $requests = $type == 'received' ? $user->pendingReceivedTradeRequests : $user->pendingSentTradeRequests;
+        return view('trades.'.$type, ['requests' => $requests]);
     }
 
     public function show(User $receiver, Book $requestedBook){

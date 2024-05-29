@@ -1,15 +1,37 @@
 <?php
 
-use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
 
-it('should render user\'s pending received trade requests', function () {
-    $user = User::factory()->create();
-    login($user)->get('trades/requests/received')
+it('should render user\'s pending received and sent trade requests', function (String $type) {
+    $user = userWithBooks();
+    $anotherUser = userWithBooks();
+    $userBook = $user->books()->first()->id;
+    $anotherUserBook = $user->books()->first()->id;
+
+    TradeRequest::create([
+        'receiver_id' => $type == 'received' ? $user->id : $anotherUser->id,
+        'sender_id' => $type == 'received' ? $anotherUser->id : $user->id,
+        'requested_book_id' => $type == 'received' ? $userBook : $anotherUserBook,
+        'proposed_book_id' => $type == 'received' ? $anotherUserBook : $userBook
+    ]);
+
+    login($user)->get('/trades/requests/'.$type)
         ->assertStatus(200)
-        ->assertViewIs('trades.received.index');
-});
+        ->assertViewIs('trades.'.$type)
+        ->assertViewHas('requests', $type == 'received' ? $user->pendingReceivedTradeRequests : $user->pendingSentTradeRequests);
+})->with([
+    'received',
+    'sent'
+]);
+
+it('should redirect on home page if requests type is not received or sent', function(String $type) {
+    login()->get('/trades/requests/'.$type)
+        ->assertStatus(302)
+        ->assertRedirect('/');
+})->with(
+    [fake()->word()]
+);
 
 it('should ask for a trade request',function (){
     $receiver = userWithTradeableBooks();
