@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Traits\ValidateRequestsType;
 
 class TradeRequestController extends Controller
 {
+    use ValidateRequestsType;
     public static String $usersBaseURL = '/users/';
     public static String $onTradeBooks = '/books/ontrade';
 
@@ -16,7 +17,7 @@ class TradeRequestController extends Controller
     {
         $user = auth()->user();
 
-        if(!in_array($type,['received','sent'])){
+        if(!$this->validateRequestsType($type)){
             return redirect('/');
         }
 

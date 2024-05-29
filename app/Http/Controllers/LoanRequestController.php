@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\LoanRequest;
 use App\Models\User;
+use App\Traits\ValidateRequestsType;
 
 class LoanRequestController extends Controller
 {
+    use ValidateRequestsType;
     public function index(String $type){
         $user = auth()->user();
 
-        if(!in_array($type, ['received','sent'])){
+        if(!$this->validateRequestsType($type)){
             return redirect('/');
         }
 
