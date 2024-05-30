@@ -54,20 +54,21 @@ class UserController extends Controller
     {
         if($state === 'onloan')
         {
-            return view('users.show-books', ['user' => $user, 'books' => $user->booksOnLoan()]);
+            $books = $user->booksOnLoan();
         }
         elseif ($state === 'ontrade')
         {
-            return view('users.show-books', ['user' => $user, 'books' => $user->booksOnTrade()]);
+            $books = $user->booksOnTrade();
         }
         elseif ($state === 'onwishlist')
         {
-            return view('users.show-books', ['user'=> $user, 'books'=> $user->booksOnWishlist()]);
+            $books = $user->booksOnWishlist();
         }
         else
         {
-           return view('users.show-books', ['user' => $user, 'books' => $user->booksOnLoan()->merge($user->booksOnTrade())]);
+           $books = $user->booksOnLoan()->merge($user->booksOnTrade());
         }
+        return view('users.show-books', ['user'=>$user, 'books'=>$books]);
     }
 
     public function booksCreate():View|Factory|Application
