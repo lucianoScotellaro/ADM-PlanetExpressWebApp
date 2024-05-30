@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -76,7 +75,7 @@ class User extends Authenticatable
     {
         return $this->books()->wherePivot('onWishlist', 1)->get();
     }
-    
+
     //Trade Requests relationships
     public function pendingSentTradeRequests(): HasMany
     {
@@ -119,5 +118,11 @@ class User extends Authenticatable
             ->where('response', '=', true)
             ->with(['receiver','sender','requestedBook'])
             ->get();
+    }
+
+    //Reviews
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, foreignKey: 'reviewed_id')->with('reviewer');
     }
 }

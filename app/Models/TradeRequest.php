@@ -30,4 +30,18 @@ class TradeRequest extends Model
     public function proposedBook(){
         return $this->belongsTo(Book::class, foreignKey: 'proposed_book_id');
     }
+
+    public static function loadTrades(User $firstUser, User $secondUser)
+    {
+        return TradeRequest::where('response', '=', '1', 'and')
+            ->where('receiver_id', '=', $firstUser->id, 'and')
+            ->where('sender_id', '=', $secondUser->id)
+            ->get()
+            ->union(
+                TradeRequest::where('response', '=', '1', 'and')
+                    ->where('receiver_id', '=', $secondUser->id, 'and')
+                    ->where('sender_id', '=', $firstUser->id)
+                    ->get()
+            );
+    }
 }
