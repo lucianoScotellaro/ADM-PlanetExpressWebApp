@@ -72,31 +72,54 @@ it('should not send a loan request for a book is not in receiver\'s loans list',
         ->assertSessionHas('notInListError');
 });
 
-it('should render user\'s pending received loan requests page', function (){
-    $user = User::factory()->create();
-    login($user)->get('loans/requests/received')
+it('should render user\'s pending received and sent loan requests', function (String $type) {
+    $user = userWithBooks();
+    $anotherUser = userWithBooks();
+    $userBook = $user->books()->first()->id;
+    $anotherUserBook = $user->books()->first()->id;
+
+    LoanRequest::create([
+        'receiver_id' => $type == 'received' ? $user->id : $anotherUser->id,
+        'sender_id' => $type == 'received' ? $anotherUser->id : $user->id,
+        'requested_book_id' => $type == 'received' ? $userBook : $anotherUserBook,
+        'expiration'=> 14
+    ]);
+
+    login($user)->get('/loans/requests/'.$type)
         ->assertStatus(200)
-        ->assertViewIs('loans.received.index')
-        ->assertViewHas('user',$user);
-});
+        ->assertViewIs('loans.'.$type)
+        ->assertViewHas('requests', $type == 'received' ? $user->pendingReceivedLoanRequests : $user->pendingSentLoanRequests);
+})->with([
+    'received',
+    'sent'
+]);
+
+it('should redirect to home page if loan requests type is not received or sent',function(String $type){
+    login()->get('/loans/requests/'.$type)
+        ->assertStatus(302)
+        ->assertRedirect('/');
+})->with([
+    fake()->word()
+]);
 
 it('should accept or refuse a pending loan request', function(string $action){
-    $receiver = userWithBooks();
+    $receiver = userWithLoanableBooks();
     $sender = userWithBooks();
+    $requestedBook  = $receiver->books()->first();
 
     $pendingRequest = LoanRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_id'=>$receiver->books()->first()->id,
+        'requested_book_id'=>$requestedBook->id,
         'response'=>null
     ]);
 
-    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id)
+    login($receiver)->get('loans/requests/'.$action.'/'.$sender->id.'/'.$requestedBook->id)
         ->assertStatus(302)
         ->assertSessionHas('success')
         ->assertRedirect('/loans/requests/received');
 
-    $request = LoanRequest::find([$receiver->id, $sender->id, $receiver->books()->first()->id]);
+    $request = LoanRequest::find([$receiver->id, $sender->id, $requestedBook->id]);
 
     if($action == 'accept'){
         expect($request->response)->toBe(1);
@@ -107,6 +130,24 @@ it('should accept or refuse a pending loan request', function(string $action){
     'accept',
     'refuse'
 ]);
+
+it('should remove requested book from receiver books list when request is accepted', function(){
+    $receiver = userWithLoanableBooks();
+    $sender = userWithLoanableBooks();
+    $requestedBook = $receiver->books()->first();
+
+    LoanRequest::create([
+        'receiver_id'=>$receiver->id,
+        'sender_id'=>$sender->id,
+        'requested_book_id'=>$requestedBook->id,
+        'expiration'=>20
+    ]);
+
+    login($receiver)->get('/loans/requests/accept/'.$sender->id.'/'.$requestedBook->id);
+
+    expect($receiver->booksOnLoan()->count())->toBe(9)
+        ->and($receiver->booksOnLoan()->contains($requestedBook->id))->not->toBeTrue();
+});
 
 it('should not accept or refuse a resolved loan request', function(string $action, bool $response){
     $receiver = userWithBooks();

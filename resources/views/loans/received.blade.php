@@ -36,6 +36,7 @@
                             <p>Author: {{$request->requestedBook->author}}</p>
                             <p>ID: {{$request->requestedBook->id}}</p>
                             <p>Requested by: <strong>{{$request->sender->name}}</strong></p>
+                            <p>For: {{$request->expiration}} days</p>
                         </div>
                         <div class="book-actions-container">
                             <x-button href="/loans/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->id}}">Give on loan</x-button>
