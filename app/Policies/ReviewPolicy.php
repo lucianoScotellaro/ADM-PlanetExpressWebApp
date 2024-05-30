@@ -11,27 +11,10 @@ class ReviewPolicy
 {
     public function reviewUser(User $authenticated, User $reviewedUser):bool
     {
-        $trades = TradeRequest::where('response', '=', '1', 'and')
-            ->where('receiver_id', '=', $authenticated->id, 'and')
-            ->where('sender_id', '=', $reviewedUser->id)
-            ->get()
-            ->union(
-                TradeRequest::where('response', '=', '1', 'and')
-                    ->where('receiver_id', '=', $reviewedUser->id, 'and')
-                    ->where('sender_id', '=', $authenticated->id)
-                    ->get()
-            );
+        $trades = TradeRequest::loadTrades($authenticated, $reviewedUser);
 
-        $loans = LoanRequest::where('response', '=', '1', 'and')
-            ->where('receiver_id', '=', $authenticated->id, 'and')
-            ->where('sender_id', '=', $reviewedUser->id)
-            ->get()
-            ->union(
-                LoanRequest::where('response', '=', '1', 'and')
-                ->where('receiver_id', '=', $reviewedUser->id, 'and')
-                ->where('sender_id', '=', $authenticated->id)
-                ->get()
-            );
+        $loans = LoanRequest::loadLoans($authenticated, $reviewedUser);
+
         return !$trades->union($loans)->isEmpty();
     }
 }
