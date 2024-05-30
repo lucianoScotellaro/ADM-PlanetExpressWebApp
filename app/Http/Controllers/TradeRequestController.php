@@ -70,15 +70,15 @@ class TradeRequestController extends Controller
         $user = auth()->user();
         $request = TradeRequest::find([$sender->id, $user->id, $proposedBook->id, $requestedBook->id]);
 
-        if($request === null){
-            return redirect($redirectURL)->with('notExistsError', 'Request does not exist.');
-        }
-
-        if($request->response !== null){
-            return redirect($redirectURL)->with('alreadyResolvedError', 'Request was already resolved.');
+        if($request === null || $request->response !== null){
+            return redirect($redirectURL)->with('invalidRequestError', 'Request you are trying to resolve is not valid.');
         }
 
         if(request()->is('trades/requests/accept/*')){
+            if(!$this->checkBooksOwnerships($sender, $requestedBook, $proposedBook)){
+                return redirect($redirectURL)->with('invalidBookError', 'One of the books is not in respective user books list.');
+            };
+
             $request->update([
                 'response'=>true
             ]);
@@ -91,4 +91,13 @@ class TradeRequestController extends Controller
         }
         return redirect($redirectURL)->with('success','Request resolved successfully!');
     }
+
+    private function checkBooksOwnerships(User $sender, Book $requestedBook, Book $proposedBook): bool
+    {
+        $userBooks = auth()->user()->books()->get();
+        $senderBooks = $sender->books()->get();
+
+        return $userBooks->contains($requestedBook) && $senderBooks->contains($proposedBook);
+    }
+
 }

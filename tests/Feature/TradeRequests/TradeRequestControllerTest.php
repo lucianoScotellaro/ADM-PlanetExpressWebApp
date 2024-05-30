@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
 
@@ -182,7 +183,7 @@ it('should not accept or refuse resolved request', function(string $action, bool
     login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
         ->assertStatus(302)
         ->assertRedirect('/trades/requests/received')
-        ->assertSessionHas('alreadyResolvedError');
+        ->assertSessionHas('invalidRequestError');
 })->with([
     'accept',
     'refuse'
@@ -198,8 +199,29 @@ it('should not accept or refuse non-existent trade request', function(string $ac
     login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
         ->assertStatus(302)
         ->assertRedirect('/trades/requests/received')
-        ->assertSessionHas('notExistsError');
+        ->assertSessionHas('invalidRequestError');
 })->with([
     'accept',
     'refuse'
+]);
+
+it('should not accept a trade request if one of the users does not own his respective book', function (String $issueUser){
+    $user = userWithTradeableBooks();
+    $anotherUser = userWithTradeableBooks();
+    $book = Book::factory()->create();
+
+    $request = TradeRequest::create([
+        'sender_id'=>$anotherUser->id,
+        'receiver_id'=>$user->id,
+        'requested_book_id'=>$issueUser == 'receiver' ? $book->id : $user->books()->first()->id,
+        'proposed_book_id'=>$issueUser == 'sender' ? $book->id : $anotherUser->books()->first()->id
+    ]);
+
+    login($user)->get('/trades/requests/accept/'.$anotherUser->id.'/'.$request->requested_book_id.'/'.$request->proposed_book_id)
+        ->assertStatus(302)
+        ->assertRedirect('/trades/requests/received')
+        ->assertSessionHas('invalidBookError');
+})->with([
+    'sender',
+    'receiver'
 ]);
