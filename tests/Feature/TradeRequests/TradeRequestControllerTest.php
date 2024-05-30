@@ -205,7 +205,7 @@ it('should not accept or refuse non-existent trade request', function(string $ac
     'refuse'
 ]);
 
-it('should not accept a trade request if one of the users does not own his respective book', function (String $issueUser){
+it('should not accept and should delete a trade request if one of the users does not own his respective book', function (String $issueUser){
     $user = userWithTradeableBooks();
     $anotherUser = userWithTradeableBooks();
     $book = Book::factory()->create();
@@ -221,6 +221,8 @@ it('should not accept a trade request if one of the users does not own his respe
         ->assertStatus(302)
         ->assertRedirect('/trades/requests/received')
         ->assertSessionHas('invalidBookError');
+
+    expect(TradeRequest::all()->count())->toBe(0);
 })->with([
     'sender',
     'receiver'

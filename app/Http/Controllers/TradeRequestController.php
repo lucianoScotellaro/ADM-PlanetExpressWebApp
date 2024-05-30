@@ -76,7 +76,8 @@ class TradeRequestController extends Controller
 
         if(request()->is('trades/requests/accept/*')){
             if(!$this->checkBooksOwnerships($sender, $requestedBook, $proposedBook)){
-                return redirect($redirectURL)->with('invalidBookError', 'One of the books is no longer available.');
+                $request->delete();
+                return redirect($redirectURL)->with('invalidBookError', 'One of the books is no longer available. Request has been deleted.');
             };
 
             $request->update([
