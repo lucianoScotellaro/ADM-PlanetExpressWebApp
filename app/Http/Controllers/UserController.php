@@ -10,10 +10,6 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Http;
-use function PHPUnit\Framework\isEmpty;
 
 class UserController extends Controller
 {
@@ -55,16 +51,21 @@ class UserController extends Controller
     {
         if($state === 'onloan')
         {
-            return view('users.show-books', ['user' => $user, 'books' => $user->booksOnLoan()]);
+            $books = $user->booksOnLoan();
         }
         elseif ($state === 'ontrade')
         {
-            return view('users.show-books', ['user' => $user, 'books' => $user->booksOnTrade()]);
+            $books = $user->booksOnTrade();
+        }
+        elseif ($state === 'onwishlist')
+        {
+            $books = $user->booksOnWishlist();
         }
         else
         {
-           return view('users.show-books', ['user' => $user, 'books' => $user->books]);
+           $books = $user->booksOnLoan()->merge($user->booksOnTrade());
         }
+        return view('users.show-books', ['user'=>$user, 'books'=>$books]);
     }
 
     public function booksCreate():View|Factory|Application
@@ -88,8 +89,15 @@ class UserController extends Controller
         }
         catch (Exception $exception)
         {
-            $user->books()->updateExistingPivot($book->id, [$state=>true]);
-            $message = 'Book updated successfully!';
+            if($state != 'onwishlist' && !$user->booksOnWishlist()->contains($book))
+            {
+                $user->books()->updateExistingPivot($book->id, [$state=>true]);
+                $message = 'Book updated successfully!';
+            }
+            else
+            {
+                $message = 'This book is either on trade, on loan or already in wishlist';
+            }
         }
         return redirect('/users/'.$user->id.'/books/'.$state)->with('message', $message);
     }
@@ -97,7 +105,19 @@ class UserController extends Controller
     public function removeBook(User $user, Book $book, String $state): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
     {
         $this->validateState($state);
-        $bookInList = $state == 'onloan' ? $user->booksOnLoan()->contains($book) : $user->booksOnTrade()->contains($book);
+
+        if($state === 'onloan')
+        {
+            $bookInList = $user->booksOnLoan()->contains($book);
+        }
+        elseif ($state === 'ontrade')
+        {
+            $bookInList = $user->booksOnTrade()->contains($book);
+        }
+        else
+        {
+            $bookInList = $user->booksOnWishlist()->contains($book);
+        }
 
         if(!$bookInList){
             abort(400);
@@ -115,17 +135,18 @@ class UserController extends Controller
         return view('users.show-transactions', ['trades'=>$transactions['trades'], 'loans'=>$transactions['loans']]);
     }
 
-    private function cleanBookUser(User $user): void
+    public function cleanBookUser(User $user): void
     {
         $user->books()
             ->wherePivot('onLoan', '=', 0)
             ->wherePivot('onTrade', '=', 0)
+            ->wherePivot('onWishlist', '=', 0)
             ->delete();
     }
 
     private function validateState(String $state): void
     {
-        if(!in_array($state, ['onloan','ontrade']))
+        if(!in_array($state, ['onloan','ontrade','onwishlist']))
         {
             abort(404);
         }

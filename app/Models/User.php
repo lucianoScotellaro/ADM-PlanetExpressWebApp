@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->books()->wherePivot('onTrade', 1)->get();
     }
 
+    public function booksOnWishlist(): Collection
+    {
+        return $this->books()->wherePivot('onWishlist', 1)->get();
+    }
+    
     //Trade Requests relationships
     public function pendingSentTradeRequests(): HasMany
     {
@@ -99,6 +104,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(LoanRequest::class, foreignKey: 'sender_id')->where('response', value: null)->with(['receiver','requestedBook']);
     }
+
     public function pendingReceivedLoanRequests():HasMany
     {
         return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);

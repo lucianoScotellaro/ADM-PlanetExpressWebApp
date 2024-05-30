@@ -5,10 +5,10 @@ use App\Models\LoanRequest;
 use App\Models\TradeRequest;
 
 //Book relationship tests
-it("should return all the only user's books", function ()
+it("should return all and only user's books", function ()
 {
     $user = userWithBooks();
-    $books = Book::latest()->take(10)->orderBy('id')->get();
+    $books = Book::latest()->take(40)->orderBy('id')->get();
     expect($user->books()->pluck('id') == $books->pluck('id'))->toBeTrue();
 });
 

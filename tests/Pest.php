@@ -69,12 +69,20 @@ function bookWithUsers():Book
 function userWithBooks():User
 {
     $user = User::factory()->create();
-    $books = Book::factory(10)->create();
+    $books = Book::factory(20)->create();
 
     $books->each(function ($book) use ($user)
     {
         $user->books()->attach($book->id, ['onLoan'=>fake()->boolean]);
+        $user->books()->updateExistingPivot($book->id, ['onTrade'=>fake()->boolean]);
     });
+
+    $books = Book::factory(20)->create();
+    $books->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->id, ['onWishlist'=>fake()->boolean]);
+    });
+
     return $user;
 }
 function userWithTradeableBooks():User

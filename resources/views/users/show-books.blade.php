@@ -25,7 +25,7 @@
                     List of books on trade
                 @elseif(request()->is('users/*/books/onloan'))
                     List of books on loan
-                @elseif(request()->is('users/*/books/wishlist'))
+                @elseif(request()->is('users/*/books/onwishlist'))
                     Wishlist
                 @elseif(request()->is('users/*/books*'))
                     Books on loan and on trade
@@ -38,7 +38,7 @@
                 <a href="/users/{{ $user->id }}/books/ontrade">See books on trade</a>
             </div>
             <div class="page-header">
-                <a href="/users/{{ $user->id }}/books/wishlist">See wishlist</a>
+                <a href="/users/{{ $user->id }}/books/onwishlist">See wishlist</a>
             </div>
         </div>
     </x-slot:header>
@@ -74,31 +74,46 @@
                         </div>
                         <div class="book-actions-container">
                             @can('editBooks', [\App\Models\Book::class, $user])
-                            <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onloan" method="POST" id="delete-book-{{ $book->id }}-on-loan" hidden>
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                            <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-form-button>
-                            <form action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" method="POST" id="delete-book-{{ $book->id }}-on-trade" hidden>
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                            <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
+                                @if($book->pivot->onLoan)
+                                    <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onloan" method="POST" id="delete-book-{{ $book->id }}-on-loan" hidden>
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-loan">Delete from on loan</x-form-button>
+                                @endif
+                                @if($book->pivot->onTrade)
+                                    <form action="/users/{{ $user->id }}/books/{{ $book->id }}/ontrade" method="POST" id="delete-book-{{ $book->id }}-on-trade" hidden>
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
+                                @endif
+                                @if($book->pivot->onWishlist)
+                                    <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onwishlist" method="POST" id="delete-book-{{ $book->id }}-on-wishlist" hidden>
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-wishlist">Delete from wishlist</x-form-button>
+                                @endif
                             @endcan
                             @cannot('editBooks', [\App\Models\Book::class, $user])
-                            <div class="width-max inline-form-container">
-                                <x-form-button class="width-max" form="{{$book->id}}-loan-expiration">Request on loan</x-form-button>
-                                <form id="{{$book->id}}-loan-expiration" action="/loans/ask/{{$user->id}}/{{$book->id}}" method="POST" class="inline-form">
-                                    @csrf
-                                    <x-form-field>
-                                        <x-form-label for="expiration">Days</x-form-label>
-                                        <x-form-input type="number" name="expiration" id="expiration" min="14" max="60" required/>
-                                    </x-form-field>
-                                    <x-form-error name="expiration"></x-form-error>
-                                </form>
-                            </div>
-                            <x-button href="/trades/ask/{{$user->id}}/{{$book->id}}">Request on trade</x-button>
-                                @endcannot
+                                @if($book->pivot->onLoan)
+                                    <div class="width-max inline-form-container">
+                                        <x-form-button class="width-max" form="{{$book->id}}-loan-expiration">Request on loan</x-form-button>
+                                        <form id="{{$book->id}}-loan-expiration" action="/loans/ask/{{$user->id}}/{{$book->id}}" method="POST" class="inline-form">
+                                            @csrf
+                                            <x-form-field>
+                                                <x-form-label for="expiration">Days</x-form-label>
+                                                <x-form-input type="number" name="expiration" id="expiration" min="14" max="60" required/>
+                                            </x-form-field>
+                                            <x-form-error name="expiration"></x-form-error>
+                                        </form>
+                                    </div>
+                               @endif
+                               @if($book->pivot->onTrade)
+                                    <x-button href="/trades/ask/{{$user->id}}/{{$book->id}}">Request on trade</x-button>
+                               @endif
+                            @endcannot
                         </div>
                     </li>
                 @endforeach
