@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->boolean("onLoan")->default(false);
             $table->boolean("onTrade")->default(false);
+            $table->boolean("onWishlist")->default(false);
             $table->timestamps();
             $table->primary(["book_id", "user_id"]);
         });

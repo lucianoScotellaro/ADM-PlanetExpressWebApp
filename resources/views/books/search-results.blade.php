@@ -17,7 +17,7 @@
     @if(!empty($books))
         <ul class="books-list">
             @foreach($books as $book)
-                <li class="book-list-element">
+                <li class="book-list-element max-height-lg">
                     <figure class="book-image-figure">
                         <img class="book-image" src="{{$book['thumbnailUrl'] != null ? $book['thumbnailUrl'] : asset('img/book-image-not-found.png')}}" width="290" height="440" alt="Book image"/>
                     </figure>
@@ -26,7 +26,7 @@
                         <p>Author: {{ $book['authors'] != null ? $book['authors'][0] : 'Not Available' }}</p>
                         <p>Publish date: {{ $book['publishedDate'] != null ? $book['publishedDate'] : 'Not Available' }}</p>
                     </div>
-                    <div class="book-actions-container">
+                    <div class="book-actions-container padding-y-sm">
                         <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/onloan" id="add-book-{{ $book['id'] }}-on-loan" hidden>
                             @csrf
                         </form>
@@ -35,6 +35,10 @@
                             @csrf
                         </form>
                         <x-form-button class="width-max" form="add-book-{{ $book['id'] }}-on-trade">Add to books on trade</x-form-button>
+                        <form method="POST" action="/users/{{ $user->id }}/books/{{ $book['id'] }}/onwishlist" id="add-book-{{ $book['id'] }}-on-wishlist" hidden>
+                            @csrf
+                        </form>
+                        <x-form-button class="width-max" form="add-book-{{ $book['id'] }}-on-wishlist">Add to books on wishlist</x-form-button>
                     </div>
                 </li>
             @endforeach
