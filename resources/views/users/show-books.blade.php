@@ -25,7 +25,7 @@
                     List of books on trade
                 @elseif(request()->is('users/*/books/onloan'))
                     List of books on loan
-                @elseif(request()->is('users/*/books/wishlist'))
+                @elseif(request()->is('users/*/books/onwishlist'))
                     Wishlist
                 @elseif(request()->is('users/*/books*'))
                     Books on loan and on trade
@@ -38,7 +38,7 @@
                 <a href="/users/{{ $user->id }}/books/ontrade">See books on trade</a>
             </div>
             <div class="page-header">
-                <a href="/users/{{ $user->id }}/books/wishlist">See wishlist</a>
+                <a href="/users/{{ $user->id }}/books/onwishlist">See wishlist</a>
             </div>
         </div>
     </x-slot:header>
@@ -87,6 +87,13 @@
                                         @method('DELETE')
                                     </form>
                                     <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-trade">Delete from on trade</x-form-button>
+                                @endif
+                                @if($book->pivot->onWishlist)
+                                    <form action="/users/{{ $user->id }}/books/{{ $book->id }}/onwishlist" method="POST" id="delete-book-{{ $book->id }}-on-wishlist" hidden>
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <x-form-button class="width-max" form="delete-book-{{ $book->id }}-on-wishlist">Delete from wishlist</x-form-button>
                                 @endif
                             @endcan
                             @cannot('editBooks', [\App\Models\Book::class, $user])

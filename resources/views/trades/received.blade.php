@@ -24,6 +24,16 @@
                 <p>{{session()->get('success')}}</p>
             </div>
         @endif
+        @if(session()->has('invalidRequestError'))
+            <div class="message-container text-error">
+                <p>{{session()->get('invalidRequestError')}}</p>
+            </div>
+        @endif
+        @if(session()->has('invalidBookError'))
+            <div class="message-container text-error">
+                <p>{{session()->get('invalidBookError')}}</p>
+            </div>
+        @endif
         @if(!$requests->isEmpty())
             <ul class="books-list">
                 @foreach($requests as $request)

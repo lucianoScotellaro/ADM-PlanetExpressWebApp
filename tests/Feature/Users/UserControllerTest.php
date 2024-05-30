@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\UserController;
 use App\Models\Book;
 use App\Models\User;
 
@@ -34,7 +35,7 @@ it("should render a page with all the user's books", function (User $user)
     fn() => userWithBooks()
 ]);
 
-it('should render books on loan and on trade page', function (User $user, String $state)
+it('should render books on loan, on trade and wishlist page', function (User $user, String $state)
 {
     $response = login()->get('/users/'.$user->id.'/books/'.$state);
     expect($response)
@@ -44,7 +45,8 @@ it('should render books on loan and on trade page', function (User $user, String
         ->assertViewHas('books');
 })->with([
     [fn() => userWithBooks(), 'onloan'],
-    [fn() => userWithBooks(), 'ontrade']
+    [fn() => userWithBooks(), 'ontrade'],
+    [fn()=> userWithBooks(), 'onwishlist']
 ]);
 
 it('should display users search form', function(){
@@ -149,8 +151,24 @@ it('should manage adding a book already in loans or trades list', function (Stri
     'ontrade'
 ]);
 
+it('should manage adding a book in wishlist that is already in loans or trades or wishlist', function ()
+{
+    $user = userWithBooks();
 
-it('should remove a book from the loans or trades list of the user', function (User $user, String $state)
+    $userController = new UserController();
+    $userController->cleanBookUser($user);
+
+    $books = $user->books;
+    foreach($books as $book)
+    {
+        login($user)->post('/users/'.$user->id.'/books/'.$book->id.'/onwishlist')
+            ->assertStatus(302)
+            ->assertRedirect('/users/'.$user->id.'/books/onwishlist')
+            ->assertSessionHas('message','This book is either on trade, on loan or already in wishlist');
+    }
+});
+
+it('should remove a book from the loans or trades or wishlist of the user', function (User $user, String $state)
 {
     $book = Book::factory()->create();
     $user->books()->attach($book->id, [$state => true]);
@@ -161,10 +179,11 @@ it('should remove a book from the loans or trades list of the user', function (U
         ->assertRedirect('/users/'.$user->id.'/books/'.$state);
 })->with([
     [fn() => userWithBooks(), 'onloan'],
-    [fn() => userWithBooks(), 'ontrade']
+    [fn() => userWithBooks(), 'ontrade'],
+    [fn() => userWithBooks(), 'onwishlist']
 ]);
 
-it('should not remove a book from loans or trades list of a user if \'state\' is not valid', function (String $state){
+it('should not remove a book from loans or trades or wishlist of a user if \'state\' is not valid', function (String $state){
     $user = User::factory()->create();
     $book = Book::factory()->create();
     $user->books()->attach($book->id, ['onLoan'=>true]);
