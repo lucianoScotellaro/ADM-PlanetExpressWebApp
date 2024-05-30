@@ -48,6 +48,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function transactions():array
+    {
+        return ['trades'=>$this->resolvedTradeRequests(), 'loans'=>$this->resolvedLoanRequests()];
+    }
+
     //Books Relationships
     public function books(): BelongsToMany
     {
@@ -83,6 +88,16 @@ class User extends Authenticatable
        return $this->hasMany(TradeRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook', 'proposedBook']);
     }
 
+    public function resolvedTradeRequests()
+    {
+        return TradeRequest::select()
+            ->where('receiver_id', '=', $this->id)
+            ->where('response', '=', true)
+            ->orWhere('sender_id','=', $this->id)
+            ->where('response', '=', true)
+            ->with(['receiver','sender','requestedBook','proposedBook'])
+            ->get();
+    }
 
     //Loan Requests Relationships
     public function pendingSentLoanRequests(): HasMany
@@ -93,5 +108,16 @@ class User extends Authenticatable
     public function pendingReceivedLoanRequests():HasMany
     {
         return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);
+    }
+
+    public function resolvedLoanRequests()
+    {
+        return LoanRequest::select()
+            ->where('receiver_id', '=', $this->id)
+            ->where('response', '=', true)
+            ->orWhere('sender_id','=', $this->id)
+            ->where('response', '=', true)
+            ->with(['receiver','sender','requestedBook'])
+            ->get();
     }
 }

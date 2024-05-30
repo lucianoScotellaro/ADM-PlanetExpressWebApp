@@ -146,3 +146,66 @@ it('should return user\'s pending sent loan requests', function(){
         ->and($pendingSentLoanRequests->first()->requestedBook->id == $pendingRequest->requested_book_id)->toBeTrue()
         ->and($pendingSentLoanRequests->first()->response == $pendingRequest->response)->toBeTrue();
 });
+
+//Transactions test
+it('should return user\'s past transactions', function(String $role){
+    $user = userWithBooks();
+    $anotherUser = userWithBooks();
+
+    //Transaction
+    $trade = TradeRequest::create([
+        'sender_id'=>$role == 'sender' ? $user->id : $anotherUser->id,
+        'receiver_id'=>$role == 'sender' ? $anotherUser->id : $user->id,
+        'requested_book_id'=>$role == 'sender' ? $anotherUser->books()->first()->id : $user->books()->first()->id,
+        'proposed_book_id'=>$role == 'sender' ? $user->books()->first()->id : $anotherUser->books()->first()->id,
+        'response'=>true
+    ]);
+
+    //Non-transaction (refused)
+    TradeRequest::create([
+        'sender_id'=>$role == 'sender' ? $user->id : $anotherUser->id,
+        'receiver_id'=>$role == 'sender' ? $anotherUser->id : $user->id,
+        'requested_book_id'=>$role == 'sender' ? $anotherUser->books()->get()->last()->id : $user->books()->get()->last()->id,
+        'proposed_book_id'=>$role == 'sender' ? $user->books()->get()->last()->id : $anotherUser->books()->get()->last()->id,
+        'response'=>false
+    ]);
+
+    //Transaction
+    $loan = LoanRequest::create([
+        'sender_id'=>$role == 'sender' ? $user->id : $anotherUser->id,
+        'receiver_id'=>$role == 'sender' ? $anotherUser->id : $user->id,
+        'requested_book_id'=>$role == 'sender' ? $anotherUser->books()->first()->id : $user->books()->first()->id,
+        'response'=>true
+    ]);
+
+    //Non-transaction (refused)
+    LoanRequest::create([
+        'sender_id'=>$role == 'sender' ? $user->id : $anotherUser->id,
+        'receiver_id'=>$role == 'sender' ? $anotherUser->id : $user->id,
+        'requested_book_id'=>$role == 'sender' ? $anotherUser->books()->get()->last()->id : $user->books()->get()->last()->id,
+        'response'=>false
+    ]);
+
+    $transactions = $user->transactions();
+    expect(count($transactions['trades']))->toBe(1)
+        ->and(count($transactions['loans']))->toBe(1);
+
+    $tradeFromTransactions = $transactions['trades']->first();
+    $loanFromTransactions = $transactions['loans']->first();
+    if($role == 'sender'){
+        expect($tradeFromTransactions->receiver->id == $trade->receiver_id)->toBeTrue()
+            ->and($tradeFromTransactions->proposedBook->id == $trade->proposed_book_id)->toBeTrue()
+            ->and($tradeFromTransactions->requestedBook->id == $trade->requested_book_id)->toBeTrue()
+            ->and($loanFromTransactions->receiver->id == $loan->receiver_id)->toBeTrue()
+            ->and($loanFromTransactions->requestedBook->id == $loan->requested_book_id)->toBeTrue();
+    }elseif($role == 'receiver'){
+        expect($tradeFromTransactions->sender->id == $trade->sender_id)->toBeTrue()
+            ->and($tradeFromTransactions->proposedBook->id == $trade->proposed_book_id)->toBeTrue()
+            ->and($tradeFromTransactions->requestedBook->id == $trade->requested_book_id)->toBeTrue()
+            ->and($loanFromTransactions->sender->id == $loan->sender_id)->toBeTrue()
+            ->and($loanFromTransactions->requestedBook->id == $loan->requested_book_id)->toBeTrue();
+    }
+})->with([
+    'sender',
+    'receiver'
+]);

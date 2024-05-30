@@ -12,6 +12,7 @@
 */
 
 use App\Models\Book;
+use App\Models\LoanRequest;
 use App\Models\TradeRequest;
 use App\Models\User;
 
@@ -105,6 +106,47 @@ function userWithLoanableBooks():User
     {
         $user->books()->attach($book->id, ['onLoan'=>true]);
     });
+    return $user;
+}
+
+function userWithTransactions(){
+    $user = userWithBooks();
+    $anotherUser = userWithBooks();
+
+    //Transaction
+    TradeRequest::create([
+        'sender_id'=>$user->id,
+        'receiver_id'=>$anotherUser->id,
+        'requested_book_id'=>$anotherUser->books()->first()->id,
+        'proposed_book_id'=>$user->books()->first()->id,
+        'response'=>true
+    ]);
+
+    //Non-transaction (refused)
+    TradeRequest::create([
+        'sender_id'=>$anotherUser->id,
+        'receiver_id'=>$user->id,
+        'requested_book_id'=>$user->books()->get()->last()->id,
+        'proposed_book_id'=>$anotherUser->books()->get()->last()->id,
+        'response'=>true
+    ]);
+
+    //Transaction
+    LoanRequest::create([
+        'sender_id'=>$user->id,
+        'receiver_id'=>$anotherUser->id,
+        'requested_book_id'=>$anotherUser->books()->first()->id,
+        'response'=>true
+    ]);
+
+    //Non-transaction (refused)
+    LoanRequest::create([
+        'sender_id'=>$anotherUser->id,
+        'receiver_id'=>$user->id,
+        'requested_book_id'=>$user->books()->get()->last()->id,
+        'response'=>true
+    ]);
+
     return $user;
 }
 

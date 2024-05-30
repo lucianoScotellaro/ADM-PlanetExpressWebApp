@@ -30,8 +30,13 @@ Route::get('users/search/proposers/{book}', [UserController::class, 'showPropose
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
 Route::get('/users/{user}', [UserController::class, 'show']);
-Route::get('/users/{user}/books', [UserController::class, 'showBooks'])->middleware('auth');
+
+Route::get('/users/{user}/books', [UserController::class, 'showBooks'])
+    ->middleware('auth');
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
+
+Route::get('/users/{user}/transactions', [UserController::class, 'showTransactions'])
+    ->middleware('auth');
 
 Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook'])
     ->middleware('auth')

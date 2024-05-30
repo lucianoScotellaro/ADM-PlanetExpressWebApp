@@ -10,9 +10,6 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
@@ -132,6 +129,12 @@ class UserController extends Controller
         return redirect('/users/'.$user->id.'/books/'.$state)->with('message','Book removed successfully');
     }
 
+    public function showTransactions(User $user)
+    {
+        $transactions = $user->transactions();
+        return view('users.show-transactions', ['trades'=>$transactions['trades'], 'loans'=>$transactions['loans']]);
+    }
+
     public function cleanBookUser(User $user): void
     {
         $user->books()
@@ -160,6 +163,7 @@ class UserController extends Controller
         if(!in_array($searchOn, ['proposedBook','requestedBook'])){
             return false;
         }
+
         return true;
     }
 }
