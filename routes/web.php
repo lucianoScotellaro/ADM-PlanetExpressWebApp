@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\LoanRequestController;
 use App\Http\Controllers\TradeRequestController;
 use App\Http\Controllers\UserController;
 use App\Models\Book;
 use App\Models\LoanRequest;
+use App\Models\Review;
 use App\Models\TradeRequest;
 use Illuminate\Support\Facades\Route;
 
@@ -80,3 +82,10 @@ Route::get('/loans/requests/refuse/{sender}/{requestedBook}', [LoanRequestContro
     ->middleware('auth')
     ->can('resolveRequest', [LoanRequest::class, 'sender', 'requestedBook']);
 
+//Reviews
+Route::get('reviews/{user}', [ReviewController::class, 'show'])
+    ->middleware('auth');
+
+Route::post('reviews/{reviewedUser}', [ReviewController::class, 'store'])
+    ->middleware('auth')
+    ->can('reviewUser', [Review::class, 'reviewedUser']);

@@ -13,6 +13,15 @@
         </div>
     </x-slot:header>
     <main class="register" style="background-image: url('{{ asset('img/home-background.jpg') }}')">
+        <div class="text-box">
+            <p><strong>Password must contain:</strong></p>
+            <ul>
+                <li> At least one uppercase character </li>
+                <li> At least one lowercase character</li>
+                <li> At least one number </li>
+                <li> At least one special character </li>
+            </ul>
+        </div>
         <form action="/register" method="POST" class="signup-form">
             @csrf
             <div class="form-header">

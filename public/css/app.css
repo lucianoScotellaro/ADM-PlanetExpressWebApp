@@ -161,7 +161,8 @@ main{
 
 .signup-form,
 .login-form,
-.search-form{
+.search-form,
+.rate-user-form{
     align-items: center;
     background-color: var(--PLANET-GREEN);
     border-radius: 10px;
@@ -199,6 +200,24 @@ main{
     justify-content: center;
 }
 
+.rate-user-form{
+    max-height: 450px;
+    max-width: 350px;
+    height: 100%;
+    width: 100%;
+    z-index: 10000;
+    box-shadow: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+}
+
+.show-rate-user-form .rate-user-form{
+    opacity: 1;
+    transition: all 0.2s ease;
+    pointer-events: auto;
+}
+
 .inline-form-container{
     display: flex;
     flex-flow: row nowrap;
@@ -214,6 +233,23 @@ main{
     align-items: center;
     justify-content: space-between;
     margin-top: 20px;
+}
+
+.text-box{
+    background-color: var(--PLANET-YELLOW);
+    border: solid var(--PLANET-RED) 3px;
+    border-radius: 8px;
+    box-shadow: var(--PLANET-LIGHT-RED) 4px 4px;
+    position: fixed;
+    top: 200px;
+    right: 50px;
+    width: 450px;
+    height: auto;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-around;
+    align-items: start;
+    padding: 8px;
 }
 
 /* ELEMENTS */
@@ -359,6 +395,13 @@ button:hover {
     color: var(--PLANET-RED);
 }
 
+/*  TEXT BOX */
+
+.text-box ul{
+    list-style: none;
+    margin: 5px 0;
+}
+
 /* PROFILE INFO */
 
 .profile-info-container{
@@ -391,6 +434,13 @@ button:hover {
     border-radius: 10px;
     width: 80%;
     height: auto;
+}
+
+.review-buttons-container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
 }
 
 .last-transactions{
@@ -476,7 +526,8 @@ button:hover {
     transition: all 0.2s ease;
 }
 
-.book-image-figure{
+.book-image-figure,
+.book-list-element .profile-image-figure{
     width: 100%;
     height: 100%;
     max-width: 240px;
@@ -487,12 +538,17 @@ button:hover {
     justify-content: center;
 }
 
-.book-image{
+.book-image,
+.book-list-element .profile-image-figure .profile-image{
     width: 45%;
     height: auto;
     border: 2px solid var(--PLANET-RED);
     border-radius: 5px;
     box-shadow: var(--PLANET-LIGHT-RED) 3px 3px;
+}
+
+.book-list-element .profile-image-figure .profile-image{
+    width: 60%;
 }
 
 .book-info-container{
@@ -529,7 +585,8 @@ button:hover {
 
 .signup-form .form-header,
 .login-form .form-header,
-.search-form .form-header{
+.search-form .form-header,
+.rate-user-form .form-header{
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-around;
@@ -537,9 +594,15 @@ button:hover {
     height: 60px;
 }
 
+.rate-user-form .form-header{
+    margin-top: 8px;
+    height: 80px;
+}
+
 .signup-form .form-header p,
 .login-form .form-header p,
-.search-form .form-header p{
+.search-form .form-header p,
+.rate-user-form .form-header p{
     display: flex;
     padding: 5px;
     font-size: 30px;
@@ -548,6 +611,10 @@ button:hover {
     border-radius: 10px;
     text-align: center;
     align-items: center;
+}
+
+.rate-user-form .form-header p{
+    font-size: 1rem;
 }
 
 .login-form .form-header p {
@@ -579,10 +646,30 @@ button:hover {
     margin: 40px 0;
 }
 
+.rate-user-form .form-fields{
+    border: none;
+    height: 100%;
+    margin: 10px;
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-start;
+    align-items: center;
+    row-gap: 15px;
+}
+
 .form-fields-row{
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.rate-user-form .form-fields-row{
+    height: 100%;
+    width: 100%;
+}
+
+.rate-user-form .stars-field{
+    max-height: 75px;
 }
 
 .form-field {
@@ -590,6 +677,12 @@ button:hover {
     border: solid var(--PLANET-RED) 2px;
     background-color: var(--PLANET-YELLOW);
     border-radius: 5px;
+}
+
+.rate-user-form .form-field{
+    width: 100%;
+    max-height: 200px;
+    height: 100%;
 }
 
 .inline-form .form-field{
@@ -616,6 +709,10 @@ button:hover {
     text-align: center;
 }
 
+.rate-user-form .form-label{
+    height: 30px;
+}
+
 .form-input {
     font-family: "Share Tech Mono", sans-serif;
     width: 100%;
@@ -626,6 +723,20 @@ button:hover {
     outline: none;
     font-size: 16px;
     padding: 0 8px;
+}
+
+.rate-user-form .comment-input{
+    width: 100%;
+    height: calc(100% - 30px);
+}
+
+.rate-user-form textarea{
+    padding:8px;
+    line-height: 1.1rem;
+}
+
+textarea::-webkit-scrollbar{
+    display: none;
 }
 
 .inline-form .form-input{
@@ -651,6 +762,10 @@ button:hover {
     border: 3px solid var(--PLANET-RED);
     border-radius: 10px;
     cursor: pointer;
+}
+
+.rate-user-form .form-btn{
+    margin-bottom: 10px;
 }
 
 .form-btn:hover,
@@ -684,6 +799,11 @@ button:hover {
     width: 100%;
     padding: 1px 20%;
     text-align: center;
+}
+
+.rate-user-form .form-error{
+    padding: 1px 8px;
+    font-size: 0.7rem;
 }
 
 /* OTHER */
@@ -762,6 +882,10 @@ button:hover {
     padding-bottom: 10px;
 }
 
+.padding-right-sm{
+    padding-right: 10px;
+}
+
 .no-top{
     top: 0;
 }
@@ -770,6 +894,14 @@ button:hover {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
+}
+
+.flex-col-wrap{
+    flex-flow: column wrap;
+}
+
+.justify-text{
+    text-align: justify;
 }
 
 .justify-space-around{

@@ -80,4 +80,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(LoanRequest::class, foreignKey: 'receiver_id')->where('response',value: null)->with(['sender', 'requestedBook']);
     }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, foreignKey: 'reviewed_id')->with('reviewer');
+    }
 }
