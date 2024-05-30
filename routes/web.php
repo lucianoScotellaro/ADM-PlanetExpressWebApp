@@ -32,8 +32,13 @@ Route::get('users/search/proposers/{book}', [UserController::class, 'showPropose
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 
 Route::get('/users/{user}', [UserController::class, 'show']);
-Route::get('/users/{user}/books', [UserController::class, 'showBooks'])->middleware('auth');
+
+Route::get('/users/{user}/books', [UserController::class, 'showBooks'])
+    ->middleware('auth');
 Route::get('/users/{user}/books/{state}', [UserController::class, 'showBooks']);
+
+Route::get('/users/{user}/transactions', [UserController::class, 'showTransactions'])
+    ->middleware('auth');
 
 Route::post('/users/{user}/books/{bookID}/{state}', [UserController::class, 'addBook'])
     ->middleware('auth')
@@ -47,31 +52,27 @@ Route::delete('/users/{user}/books/{book}/{state}', [UserController::class, 'rem
 Route::get('/books/search', [BookController::class, 'search']);
 
 //Trades
-Route::get('/trades/requests/received', [TradeRequestController::class, 'index'])
+Route::get('/trades/requests/{type}', [TradeRequestController::class, 'index'])
     ->middleware('auth');
 
 Route::get('/trades/ask/{receiver}/{requestedBook}', [TradeRequestController::class, 'show'])
-    ->middleware('auth')
-    ->can('requestBook', [TradeRequest::class, 'receiver', 'requestedBook']);
+    ->middleware('auth');
 
 Route::post('/trades/propose/{proposedBook}', [TradeRequestController::class, 'store'])
-    ->middleware('auth')
-    ->can('proposeBook', [TradeRequest::class, 'proposedBook']);
+    ->middleware('auth');
 
 Route::get('/trades/requests/accept/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
+    ->middleware('auth');
 
 Route::get('/trades/requests/refuse/{sender}/{requestedBook}/{proposedBook}', [TradeRequestController::class, 'update'])
-    ->middleware('auth')
-    ->can('resolveRequest', [TradeRequest::class, 'sender', 'requestedBook', 'proposedBook']);
+    ->middleware('auth');
 
 //Loans
 Route::post('/loans/ask/{receiver}/{requestedBook}', [LoanRequestController::class, 'store'])
     ->middleware('auth')
     ->can('requestBook', [LoanRequest::class, 'receiver', 'requestedBook']);
 
-Route::get('/loans/requests/received', [LoanRequestController::class, 'index'])
+Route::get('/loans/requests/{type}', [LoanRequestController::class, 'index'])
     ->middleware('auth');
 
 Route::get('/loans/requests/accept/{sender}/{requestedBook}', [LoanRequestController::class, 'update'])

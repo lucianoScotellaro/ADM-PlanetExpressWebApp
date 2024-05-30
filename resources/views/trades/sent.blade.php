@@ -15,28 +15,22 @@
     </x-slot:navbar>
     <x-slot:header>
         <div class="page-header">
-            <p>Received trade requests</p>
+            <p>Sent trade requests</p>
         </div>
     </x-slot:header>
     <main class="books-list-container">
-        @if(session()->has('success'))
-            <div class="message-container text-success">
-                <p>{{session()->get('success')}}</p>
-            </div>
-        @endif
         @if(!$requests->isEmpty())
             <ul class="books-list">
                 @foreach($requests as $request)
                     <li class="book-list-element">
                         <div class="first-book">
                             <figure class="book-image-figure">
-                                <img class="book-image" src="{{ $request->requestedBook->thumbnailUrl != null ? $request->requestedBook->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
+                                <img class="book-image" src="{{ $request->proposedBook->thumbnailUrl != null ? $request->proposedBook->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
                             </figure>
                             <div class="book-info-container">
-                                <p><strong>GIVE</strong></p>
-                                <p>Title: {{$request->requestedBook->title}}</p>
-                                <p>Author: {{$request->requestedBook->author}}</p>
-                                <p>Requested by: <strong>{{$request->sender->name}}</strong></p>
+                                <p><strong>GIVE TO: {{$request->receiver->name}}</strong></p>
+                                <p>Title: {{$request->proposedBook->title}}</p>
+                                <p>Author: {{$request->proposedBook->author}}</p>
                             </div>
                         </div>
                         <figure class="swap-image-figure">
@@ -45,25 +39,20 @@
                         <div class="second-book">
                             <div class="book-info-container">
                                 <p><strong>GAIN</strong></p>
-                                <p>Title: {{$request->proposedBook->title}}</p>
-                                <p>Author: {{$request->proposedBook->author}}</p>
+                                <p>Title: {{$request->requestedBook->title}}</p>
+                                <p>Author: {{$request->requestedBook->author}}</p>
                             </div>
                             <figure class="book-image-figure">
-                                <img class="book-image" src="{{ $request->proposedBook->thumbnailUrl != null ? $request->proposedBook->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
+                                <img class="book-image" src="{{ $request->requestedBook->thumbnailUrl != null ? $request->requestedBook->thumbnailUrl : asset('img/book-image-not-found.png') }}" width="290" height="440" alt="Book image"/>
                             </figure>
-                        </div>
-                        <div class="book-actions-container actions-small">
-                            <x-button href="/trades/requests/accept/{{$request->sender->id}}/{{$request->requestedBook->id}}/{{$request->proposedBook->id}}">Accept</x-button>
-                            <x-button href="/trades/requests/refuse/{{$request->sender->id}}/{{$request->requestedBook->id}}/{{$request->proposedBook->id}}">Refuse</x-button>
                         </div>
                     </li>
                 @endforeach
             </ul>
         @else
             <div class="empty-list">
-                <p>There are no trade requests for you.</p>
+                <p>You have no sent trade requests.</p>
             </div>
         @endif
     </main>
 </x-layout>
-

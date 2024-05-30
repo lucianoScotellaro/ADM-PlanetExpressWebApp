@@ -4,12 +4,35 @@ use App\Models\Book;
 use App\Models\TradeRequest;
 use App\Models\User;
 
-it('should render user\'s pending received trade requests', function () {
-    $user = User::factory()->create();
-    login($user)->get('trades/requests/received')
+it('should render user\'s pending received and sent trade requests', function (String $type) {
+    $user = userWithBooks();
+    $anotherUser = userWithBooks();
+    $userBook = $user->books()->first()->id;
+    $anotherUserBook = $user->books()->first()->id;
+
+    TradeRequest::create([
+        'receiver_id' => $type == 'received' ? $user->id : $anotherUser->id,
+        'sender_id' => $type == 'received' ? $anotherUser->id : $user->id,
+        'requested_book_id' => $type == 'received' ? $userBook : $anotherUserBook,
+        'proposed_book_id' => $type == 'received' ? $anotherUserBook : $userBook
+    ]);
+
+    login($user)->get('/trades/requests/'.$type)
         ->assertStatus(200)
-        ->assertViewIs('trades.received.index');
-});
+        ->assertViewIs('trades.'.$type)
+        ->assertViewHas('requests', $type == 'received' ? $user->pendingReceivedTradeRequests : $user->pendingSentTradeRequests);
+})->with([
+    'received',
+    'sent'
+]);
+
+it('should redirect on home page if requests type is not received or sent', function(String $type) {
+    login()->get('/trades/requests/'.$type)
+        ->assertStatus(302)
+        ->assertRedirect('/');
+})->with(
+    [fake()->word()]
+);
 
 it('should ask for a trade request',function (){
     $receiver = userWithTradeableBooks();
@@ -22,19 +45,22 @@ it('should ask for a trade request',function (){
 });
 
 it('should not ask for a trade request to himself', function(){
-    $user = userWithBooks();
+    $user = userWithTradeableBooks();
 
     login($user)->get('trades/ask/'.$user->id.'/'.$user->books()->first()->id)
-        ->assertStatus(403);
+        ->assertStatus(302)
+        ->assertRedirect('/users/'.$user->id.'/books/ontrade')
+        ->assertSessionHas('invalidRequest');
 });
 
 it('should not ask for a trade request where requested book is not in receiver books list', function(){
-    $receiver = userWithBooks();
+    $receiver = userWithLoanableBooks();
     $sender = User::factory()->create();
-    $book = Book::factory()->create();
 
-    login($sender)->get('trades/ask/'.$receiver->id.'/'.$book->id)
-        ->assertStatus(403);
+    login($sender)->get('/trades/ask/'.$receiver->id.'/'.$receiver->books()->first()->id)
+        ->assertStatus(302)
+        ->assertRedirect('/users/'.$receiver->id.'/books/ontrade')
+        ->assertSessionHas('notInListError');
 });
 
 it('should create pending trade request proposing his book', function(){
@@ -72,9 +98,12 @@ it('should not create the same pending trade request for the same user', functio
 it('should not create pending trade request proposing not his book', function(){
     $receiver = userWithBooks();
     $sender = userWithBooks();
+    session(['receiver'=>$receiver->id, 'requestedBook'=>$receiver->books()->first()->id]);
 
     login($sender)->post('/trades/propose/'.$receiver->books()->first()->id)
-        ->assertStatus(403);
+        ->assertStatus(302)
+        ->assertRedirect('/users/'.$receiver->id.'/books/ontrade')
+        ->assertSessionHas('notInListError');
 });
 
 it('should not create a trade request if requested book is not in receiver trades list', function(){
@@ -87,23 +116,25 @@ it('should not create a trade request if requested book is not in receiver trade
 });
 
 it('should accept or refuse pending trade request',function(string $action){
-    $receiver = userWithBooks();
-    $sender = userWithBooks();
+    $receiver = userWithTradeableBooks();
+    $sender = userWithTradeableBooks();
+    $requestedBook = $receiver->books()->first();
+    $proposedBook = $sender->books()->first();
 
     TradeRequest::create([
         'sender_id'=>$sender->id,
         'receiver_id'=>$receiver->id,
-        'requested_book_id'=>$receiver->books()->first()->id,
-        'proposed_book_id'=>$sender->books()->first()->id,
+        'requested_book_id'=>$requestedBook->id,
+        'proposed_book_id'=>$proposedBook->id,
         'response'=>null
     ]);
 
-    login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
+    login($receiver)->get('/trades/requests/'.$action.'/'.$sender->id.'/'.$requestedBook->id.'/'.$proposedBook->id)
         ->assertStatus(302)
-        ->assertSessionHas('success')
-        ->assertRedirect('/trades/requests/received');
+        ->assertRedirect('/trades/requests/received')
+        ->assertSessionHas('success');
 
-    $request = TradeRequest::find([$sender->id, $receiver->id, $sender->books()->first()->id, $receiver->books()->first()->id]);
+    $request = TradeRequest::find([$sender->id, $receiver->id, $proposedBook->id, $requestedBook->id]);
 
     if($action == 'accept'){
         expect($request->response)->toBe(1);
@@ -116,8 +147,29 @@ it('should accept or refuse pending trade request',function(string $action){
     'refuse'
 ]);
 
-it('cannot accept or refuse resolved request', function(string $action, bool $response){
-    $receiver = userWithBooks();
+it('should remove requested and proposed books from users books list when request is accepted',function(){
+    $receiver = userWithTradeableBooks();
+    $sender = userWithTradeableBooks();
+    $requestedBook = $receiver->books()->first();
+    $proposedBook = $sender->books()->first();
+
+    TradeRequest::create([
+        'receiver_id'=>$receiver->id,
+        'sender_id'=>$sender->id,
+        'requested_book_id'=>$requestedBook->id,
+        'proposed_book_id'=>$proposedBook->id
+    ]);
+
+    login($receiver)->get('/trades/requests/accept/'.$sender->id.'/'.$requestedBook->id.'/'.$sender->books()->first()->id);
+
+    expect($receiver->booksOnTrade()->count())->toBe(9)
+        ->and($receiver->booksOnTrade()->contains($requestedBook->id))->not->toBeTrue()
+        ->and($sender->booksOnTrade()->count())->toBe(9)
+        ->and($sender->booksOnTrade()->contains($proposedBook->id))->not->toBeTrue();
+});
+
+it('should not accept or refuse resolved request', function(string $action, bool $response){
+    $receiver = userWithTradeableBooks();
     $sender = userWithBooks();
 
     TradeRequest::create([
@@ -129,7 +181,9 @@ it('cannot accept or refuse resolved request', function(string $action, bool $re
     ]);
 
     login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
-        ->assertStatus(403);
+        ->assertStatus(302)
+        ->assertRedirect('/trades/requests/received')
+        ->assertSessionHas('invalidRequestError');
 })->with([
     'accept',
     'refuse'
@@ -138,13 +192,38 @@ it('cannot accept or refuse resolved request', function(string $action, bool $re
     false
 ]);
 
-it('cannot accept or refuse non-existent trade request', function(string $action){
+it('should not accept or refuse non-existent trade request', function(string $action){
     $receiver = userWithBooks();
     $sender = userWithBooks();
 
     login($receiver)->get('trades/requests/'.$action.'/'.$sender->id.'/'.$receiver->books()->first()->id.'/'.$sender->books()->first()->id)
-        ->assertStatus(403);
+        ->assertStatus(302)
+        ->assertRedirect('/trades/requests/received')
+        ->assertSessionHas('invalidRequestError');
 })->with([
     'accept',
     'refuse'
+]);
+
+it('should not accept and should delete a trade request if one of the users does not own his respective book', function (String $issueUser){
+    $user = userWithTradeableBooks();
+    $anotherUser = userWithTradeableBooks();
+    $book = Book::factory()->create();
+
+    $request = TradeRequest::create([
+        'sender_id'=>$anotherUser->id,
+        'receiver_id'=>$user->id,
+        'requested_book_id'=>$issueUser == 'receiver' ? $book->id : $user->books()->first()->id,
+        'proposed_book_id'=>$issueUser == 'sender' ? $book->id : $anotherUser->books()->first()->id
+    ]);
+
+    login($user)->get('/trades/requests/accept/'.$anotherUser->id.'/'.$request->requested_book_id.'/'.$request->proposed_book_id)
+        ->assertStatus(302)
+        ->assertRedirect('/trades/requests/received')
+        ->assertSessionHas('invalidBookError');
+
+    expect(TradeRequest::all()->count())->toBe(0);
+})->with([
+    'sender',
+    'receiver'
 ]);
