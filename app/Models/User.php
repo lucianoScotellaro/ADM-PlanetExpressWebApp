@@ -70,7 +70,8 @@ class User extends Authenticatable
     public function booksOnWishlist(): Collection
     {
         return $this->books()->wherePivot('onWishlist', 1)->get();
-      
+    }
+    
     //Trade Requests relationships
     public function pendingSentTradeRequests(): HasMany
     {
