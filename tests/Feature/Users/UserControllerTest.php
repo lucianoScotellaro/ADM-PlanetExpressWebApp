@@ -209,3 +209,14 @@ it('should render proposers page', function(){
         ->assertViewHas('book',$book)
         ->assertViewHas('proposers');
 });
+
+it('should render user\'s transactions page', function (){
+    $user = userWithTransactions();
+    $transactions = $user->transactions();
+
+    login($user)->get('/users/'.$user->id.'/transactions')
+        ->assertStatus(200)
+        ->assertViewIs('users.show-transactions')
+        ->assertViewHas('trades',$transactions['trades'])
+        ->assertViewHas('loans',$transactions['loans']);
+});

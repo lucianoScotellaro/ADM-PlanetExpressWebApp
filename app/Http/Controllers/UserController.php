@@ -13,6 +13,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use function PHPUnit\Framework\isEmpty;
 
 class UserController extends Controller
 {
@@ -106,6 +107,12 @@ class UserController extends Controller
         $this->cleanBookUser($user);
 
         return redirect('/users/'.$user->id.'/books/'.$state)->with('message','Book removed successfully');
+    }
+
+    public function showTransactions(User $user)
+    {
+        $transactions = $user->transactions();
+        return view('users.show-transactions', ['trades'=>$transactions['trades'], 'loans'=>$transactions['loans']]);
     }
 
     private function cleanBookUser(User $user): void

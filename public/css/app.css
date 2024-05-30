@@ -124,7 +124,8 @@ main{
     background-size: cover;
 }
 
-.books-list-container{
+.books-list-container,
+.transactions-list-container{
     position: relative;
     top: 10vh;
     width: 100%;
@@ -133,6 +134,11 @@ main{
     justify-content: flex-start;
     align-items: center;
     overflow: auto;
+}
+
+.transactions-list-container{
+    justify-content: space-around;
+    padding-bottom: 30px;
 }
 
 .message-container{
@@ -444,7 +450,8 @@ button:hover {
 
 /* BOOKS LIST */
 
-.books-list{
+.books-list,
+.transactions-list{
     position: absolute;
     top: 50px;
     height: 100%;
@@ -454,6 +461,15 @@ button:hover {
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
+}
+
+.transactions-list{
+    height: auto;
+    position: initial;
+}
+
+.transactions-list-container h1{
+    margin: 20px 0;
 }
 
 .book-list-element{
