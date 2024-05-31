@@ -58,7 +58,8 @@ class User extends Authenticatable
         return $this->belongsToMany(Book::class)
             ->withTimestamps()
             ->withPivot('onLoan')
-            ->withPivot('onTrade');
+            ->withPivot('onTrade')
+            ->withPivot('onWishlist');
     }
 
     public function booksOnLoan(): Collection
