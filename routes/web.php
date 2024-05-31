@@ -10,7 +10,6 @@ use App\Http\Controllers\UserController;
 use App\Models\Book;
 use App\Models\LoanRequest;
 use App\Models\Review;
-use App\Models\TradeRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
