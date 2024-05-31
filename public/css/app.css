@@ -125,7 +125,7 @@ main{
 }
 
 .books-list-container,
-.transactions-list-container{
+.transactions{
     position: relative;
     top: 10vh;
     width: 100%;
@@ -311,7 +311,8 @@ button:hover {
 }
 
 .navbar-el {
-    margin: 20px;
+    padding: 20px;
+    position: relative;
 }
 
 .nav-link {
@@ -323,6 +324,45 @@ button:hover {
 
 .nav-link:hover {
     text-decoration: underline;
+}
+
+.requests-nav-links-container{
+    width: 150px;
+    position: absolute;
+    top: 8vh;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--PLANET-YELLOW);
+    border: solid var(--PLANET-RED) 3px;
+    border-radius: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+}
+
+.requests-nav-links-container:hover{
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.requests-nav-links-container p{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 1.8rem;
+    border-bottom: solid var(--PLANET-RED) 2px;
+    font-weight: bold;
+}
+
+.request-nav-el{
+    width: 100%;
+    height: 1rem;
+    text-align: left;
+    margin-top: 6px;
+    margin-left: 6px;
 }
 
 .nav-button-container {
@@ -449,6 +489,8 @@ button:hover {
     gap: 10px;
 }
 
+/* TRANSACTIONS */
+
 .last-transactions{
     position: absolute;
     top: 13vh;
@@ -459,6 +501,19 @@ button:hover {
     width: 100%;
     height: 100%;
     gap: 1rem;
+}
+
+.transactions-list-container{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.transactions-list-container .empty-list{
+    transform: none;
 }
 
 .transaction-header{
@@ -859,6 +914,24 @@ textarea::-webkit-scrollbar{
 
 /* GENERAL */
 
+.position-initial{
+    position: initial;
+}
+
+ul .no-style{
+    list-style: none;
+}
+
+.border-top-primary{
+    border-top: solid var(--PLANET-RED) 2px;
+}
+
+.show{
+    opacity: 1;
+    transition: all 0.2s ease;
+    pointer-events: auto;
+}
+
 .text-error{
     color: red;
     text-decoration: underline;
@@ -867,6 +940,10 @@ textarea::-webkit-scrollbar{
 .text-success{
     color: green;
     text-decoration: underline;
+}
+
+.no-underline:hover{
+    text-decoration: none;
 }
 
 .margin-top-lg{
@@ -883,6 +960,10 @@ textarea::-webkit-scrollbar{
 
 .margin-top-sm{
     margin-top: 8px;
+}
+
+.margin-bottom-sm{
+    margin-bottom: 8px;
 }
 
 .width-max{
@@ -926,6 +1007,10 @@ textarea::-webkit-scrollbar{
 
 .actions-small{
     width: 25%;
+}
+
+.z-100{
+    z-index: 100;
 }
 /* BUTTON */
 
