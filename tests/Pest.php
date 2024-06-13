@@ -109,6 +109,18 @@ function userWithLoanableBooks():User
     return $user;
 }
 
+function userWithWishlistedBooks(): User
+{
+    $user = User::factory()->create();
+    $books = Book::factory(10)->create();
+
+    $books->each(function ($book) use ($user)
+    {
+        $user->books()->attach($book->id, ['onWishlist'=>true]);
+    });
+    return $user;
+}
+
 function userWithTransactions(){
     $user = userWithBooks();
     $anotherUser = userWithBooks();

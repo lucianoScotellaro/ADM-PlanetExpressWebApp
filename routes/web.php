@@ -26,7 +26,7 @@ Route::post('/logout', [SessionController::class, 'destroy']);
 //Users
 Route::get('/users/search/form', [UserController::class, 'searchForm']);
 Route::get('/users/search', [UserController::class, 'search']);
-Route::get('users/search/proposers/{book}', [UserController::class, 'showProposers']);
+Route::get('users/search/{proposersOrClaimers}/{book}', [UserController::class, 'showProposersOrClaimers']);
 
 Route::get('/users/user/books/create', [UserController::class, 'booksCreate']);
 

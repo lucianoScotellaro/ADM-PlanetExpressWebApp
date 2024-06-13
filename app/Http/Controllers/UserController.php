@@ -26,24 +26,33 @@ class UserController extends Controller
 
     public function search()
     {
-        if(!$this->validateSearchParameters()){
+        $searchOn = request()->query('searchOn');
+        $pageNumber = request()->query('pageNumber');
+
+        if(!($pageNumber > 0 && in_array($searchOn, ['requestedBook', 'proposedBook']))){
             return redirect('users/search/form');
         }
 
         $parameters = request()->query();
-        $searchOn = request()->query('searchOn');
 
         $books = Book::searchOn($parameters, $searchOn);
         return view('users.search-results', [
             'user' => auth()->user(),
-            'books' => $books
+            'books' => $books,
+            'searchOn' => $searchOn
         ]);
     }
 
-    public function showProposers(Book $book){
-        return view('users.proposers-index',[
+    public function showProposersOrClaimers(String $proposersOrClaimers, Book $book){
+
+        if(!in_array($proposersOrClaimers, ['proposers', 'claimers'])){
+            return redirect('/users/search');
+        }
+
+        return view('users.index',[
             'book' => $book,
-            'proposers' =>  $book->proposers()->get()->where('id', '!=',auth()->id())
+            'users' =>  $proposersOrClaimers === 'proposers' ? $book->proposers()->get()->where('id', '!=',auth()->id()) : $book->claimers()->get()->where('id', '!=',auth()->id()),
+            'proposersOrClaimers' => $proposersOrClaimers
         ]);
     }
 
@@ -150,20 +159,5 @@ class UserController extends Controller
         {
             abort(404);
         }
-    }
-
-    private function validateSearchParameters():bool
-    {
-        $currentPageNumber = request()->query('pageNumber');
-        if($currentPageNumber < 1){
-            return false;
-        }
-
-        $searchOn = request()->query('searchOn');
-        if(!in_array($searchOn, ['proposedBook','requestedBook'])){
-            return false;
-        }
-
-        return true;
     }
 }
