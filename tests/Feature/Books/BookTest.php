@@ -23,6 +23,18 @@ it('should return book\'s proposers', function(){
         ->and($proposers->pluck('id')->toArray())->toBe([1,2,3]);
 });
 
+it('should return book\'s claimers', function(){
+
+    User::factory(5)->create();
+    $book = Book::factory()->create();
+
+    $book->users()->attach(1,['onWishlist'=>true]);
+    $book->users()->attach(2,['onWishlist'=>true]);
+
+    expect($book->claimers()->get()->count())->toBe(2)
+        ->and($book->users()->pluck('id')->toArray())->toBe([1,2]);
+});
+
 it('should return books matching search parameters that have at least one proposer or claimant',function(array $parameters, String $searchOn){
     User::factory(2)->create();
     $firstBook = Book::create([

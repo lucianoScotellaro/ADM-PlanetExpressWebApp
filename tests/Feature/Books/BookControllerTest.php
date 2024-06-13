@@ -78,7 +78,7 @@ it('should not store a book that is already in DB', function(String $bookID, Str
 
 it('should remove \'noParametersError\' from session when a search with parameters is performed',function(String $queryString){
     session(['noParametersError' => 'At least one parameter is required.']);
-    login()->get('books/search'.$queryString)
+    login()->get('/books/search'.$queryString)
         ->assertStatus(200)
         ->assertSessionMissing('noParametersError');
 })->with([

@@ -193,25 +193,32 @@ it('should not remove a book from loans or trades or wishlist of a user if \'sta
     fake()->word()
 ]);
 
-it('should render requestable books page', function(){
+it('should render requested or proposed books pages', function(String $requestedOrProposedBooks){
     $user = User::factory()->create();
-    $anotherUser = userWithTradeableBooks();
-    login($user)->get('/users/search?title=&author=&category=&searchOn=proposedBook&pageNumber=1')
+    $anotherUser = $requestedOrProposedBooks === 'proposedBook' ? userWithTradeableBooks() : userWithWishlistedBooks();
+    login($user)->get('/users/search?title=&author=&category=&searchOn='.$requestedOrProposedBooks.'&pageNumber=1')
         ->assertStatus(200)
         ->assertViewIs('users.search-results')
         ->assertViewHas('user', $user)
-        ->assertViewHas('books');
-});
+        ->assertViewHas('books')
+        ->assertViewHas('searchOn', $requestedOrProposedBooks);
+})->with([
+    'requestedBook',
+    'proposedBook'
+]);
 
-it('should not render requestable books page when page number <=0', function(int $pageNumber){
-    login()->get('/users/search?title=&author=&category=&searchOn=proposedBook&pageNumber='.$pageNumber)
+it('should not render proposed or requested books pages when page number <=0', function(String $requestedOrProposedBooks, int $pageNumber){
+    login()->get('/users/search?title=&author=&category=&searchOn='.$requestedOrProposedBooks.'&pageNumber='.$pageNumber)
         ->assertStatus(302)
         ->assertRedirect('users/search/form');
 })->with([
+    'requestedBook',
+    'proposedBooks'
+])->with([
     0,-2
 ]);
 
-it('should not render requestable books page when \'searchOn\' is not valid', function(String $searchOn){
+it('should not render requested or proposed books pages when \'searchOn\' is not valid', function(String $searchOn){
     login()->get('/users/search?title=&author=&category=&searchOn='.$searchOn.'&pageNumber=1')
         ->assertStatus(302)
         ->assertRedirect('users/search/form');
@@ -219,15 +226,29 @@ it('should not render requestable books page when \'searchOn\' is not valid', fu
     fake()->word()
 ]);
 
-it('should render proposers page', function(){
+it('should render proposers or claimers page', function(String $proposersOrClaimers){
     $user = User::factory()->create();
     $book = bookWithUsers();
-    login($user)->get('users/search/proposers/'.$book->id)
+    login($user)->get('users/search/'.$proposersOrClaimers.'/'.$book->id)
         ->assertStatus(200)
-        ->assertViewIs('users.proposers-index')
+        ->assertViewIs('users.index')
         ->assertViewHas('book',$book)
-        ->assertViewHas('proposers');
-});
+        ->assertViewHas('users')
+        ->assertViewHas('proposersOrClaimers', $proposersOrClaimers);
+})->with([
+    'proposers',
+    'claimers'
+]);
+
+it('should redirect if proposers or claimers page URL is invalid', function (String $invalidSubpath){
+    $user = User::factory()->create();
+    $book = bookWithUsers();
+    login($user)->get('/users/search/'.$invalidSubpath.'/'.$book->id)
+        ->assertStatus(302)
+        ->assertRedirect('/users/search');
+})->with([
+   fake()->word()
+]);
 
 it('should render user\'s transactions page', function (){
     $user = userWithTransactions();

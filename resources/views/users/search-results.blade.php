@@ -27,7 +27,11 @@
                             <p>Publish date: {{ $book->publishedDate }}</p>
                         </div>
                         <div class="book-actions-container">
-                            <x-button href="{{'/users/search/proposers/'.$book->id}}">See proposers for this book</x-button>
+                            @if($searchOn === 'proposedBook')
+                                <x-button href="{{'/users/search/proposers/'.$book->id}}">See proposers for this book</x-button>
+                            @elseif($searchOn === 'requestedBook')
+                                <x-button href="{{'/users/search/claimers/'.$book->id}}">See claimers for this book</x-button>
+                            @endif
                         </div>
                     </li>
                 @endforeach

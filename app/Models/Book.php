@@ -47,8 +47,14 @@ class Book extends Model
 
     public function proposers(): BelongsToMany
     {
-        return $this->users();
-            //->where('onWishlist', '=', 0);
+        return $this->users()
+            ->where('onWishlist', '=', 0);
+    }
+
+    public function claimers(): BelongsToMany
+    {
+        return $this->users()
+            ->where('onWishlist', '=', 1);
     }
 
     private static function search(array $parameters)
